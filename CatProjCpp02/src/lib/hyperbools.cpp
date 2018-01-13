@@ -1,4 +1,4 @@
-#include "hyperbools.hpp"
+#include "../hyperbools.hpp"
 
 namespace cat {
 /*

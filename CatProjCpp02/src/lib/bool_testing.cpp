@@ -1,4 +1,4 @@
-#include "hyperbools.hpp"
+#include "../include/hyperbools.hpp"
 
 #include <iostream>
 
@@ -25,7 +25,7 @@ template<unsigned int N >
 void print(){
 	n_bool<N > t[N+1];
 	for (int i = 0; i < N + 1; ++i){t[i] = n_bool<N >(i);}
-	
+
 	for (unsigned int i = 0; i < N + 1; ++i){
 		const n_bool<N>& t1 = t[i];
 		for (unsigned int j = 0; j < N + 1; ++j) {
@@ -34,9 +34,9 @@ void print(){
 			printAND<N>(t1,t2);
 			cout << "---------------------------------------------------------\n";
 		}
-	
+
 	}
-	
+
 }
 
 int main (){

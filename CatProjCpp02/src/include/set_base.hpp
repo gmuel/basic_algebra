@@ -9,7 +9,7 @@ namespace cat {
  *							set cat								*
  *																*
  ****************************************************************/
- 
+
 template<typename SET_TYPE >
 struct set_obj : public object<SET_TYPE > {};
 
@@ -59,7 +59,7 @@ bool operator==(const _type& t1, const _type& t2) {
  *					   pointed space cat						*
  *																*
  ****************************************************************/
- 
+
 template<typename SPACE_TYPE >
 struct pointed_obj : public set_obj<SPACE_TYPE > {
 	struct base_pt {
@@ -72,7 +72,29 @@ struct pointed : public set<SPACE_TYPE > {
 	static const pointed_obj<SPACE_TYPE >& OBJECT;
 };
 
-}
+/**
+ * @brief Generic morphism template spec for empty set {@link empty}
+ *
+ * Modelled as a singleton class - each class has one instance
+ * {@link morph::MAP}
+ */
+template<typename _pre >
+struct morph<_pre,const empty& > {
+	typedef morph<_pre,const empty&> _type;
+	typedef const empty& image;
+	image operator()(const _pre& arg) const ;//{return IMAGE;}
+//	static const _im& IMAGE;
+	~morph(){}
+	static const _type& MAP;
+private:
+	morph(){}
+	template<typename _pr1, typename _im1 >
+	morph(const morph<_pr1, _im1 >& o){}//;
+};
+template<typename _pre >
+const morph<_pre, const empty& >& morph<_pre, const empty& >::MAP = _type();
+
+} /*cat*/
 
 
 #endif /*SET_BASE_HPP*/

@@ -43,7 +43,7 @@ public:
  * Only incomplete member function - implement function member
  * as needed as a spec
  * @tparam TYPE
- * @tparam REL_TYPE should be implementing subclass
+ * @tparam REL_TYPE could be implementing subclass
  */
 template<typename TYPE , typename REL_TYPE >
 struct rel {
@@ -59,6 +59,7 @@ struct rel {
 template<typename TYPE  >
 struct reflexive : public rel<TYPE, reflexive<TYPE > > {
 	typedef rel<TYPE,reflexive<TYPE > > _base;
+
 	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t);}//should be true???
 };
 
@@ -122,7 +123,7 @@ protected:
 /**
  * @brief Generic morphism template
  */
-template<typename _pre, typename _im >
+template<typename _pre, typename _im , typename MORPHISM >
 struct morph {
 	typedef _im image;
 	image operator()(const _pre& arg) const ;//{return IMAGE;}
@@ -130,22 +131,36 @@ struct morph {
 	~morph(){}
 protected:
 	morph(){}
-	template<typename _pr1, typename _im1 >
-	morph(const morph<_pr1, _im1 >& o){}//;
+	template<typename _pr1, typename _im1 , typename MORPHISM1 >
+	morph(const morph<_pr1, _im1, MORPHISM1 >& o){}//;
 };
 
-template<typename _pre, typename _im >
-struct morph<_pre,const _im& > {
+template<typename _pre, typename _im , typename MORPHISM>
+struct morph<_pre,const _im& , const MORPHISM& > {
 	typedef const _im& image;
 	image operator()(const _pre& arg) const ;//{return IMAGE;}
 //	static const _im& IMAGE;
 	~morph(){}
 protected:
 	morph(){}
-	template<typename _pr1, typename _im1 >
-	morph(const morph<_pr1, const _im1& >& o){}
+	template<typename _pr1, typename _im1, typename MORPHISM1 >
+	morph(const morph<_pr1, const _im1& , const MORPHISM1& >& o){}
 };
 
+
+template<typename DIAG1, typename DIAG2 >
+struct functor {
+	typedef struct preimage : public cat<DIAG1 > {
+
+	} _pre;
+	typedef struct image : public cat<DIAG2 > {
+
+	} _im;
+	template<typename PRE_OBJ, typename IM_OBJ >
+	typedef struct morph_im : public morph<PRE_OBJ, IM_OBJ, morph<PRE_OBJ, IM_OBJ> > {
+
+	};
+};
 /*
 template<typename _pre, typename _im >
 const _im& morph<_pre,_im >::IMAGE = _im();

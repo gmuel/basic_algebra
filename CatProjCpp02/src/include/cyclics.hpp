@@ -4,6 +4,7 @@
 #define _H_CYCLICS_HPP_CYC_TYPE(M)\
     typedef M _cyc_
 
+namespace alg_fun {
 /*
  * Cyclic ring class template
  * @tparam CYC_TYPE some positive integer as unsigned
@@ -19,12 +20,12 @@ struct cyclic {
 	 * Acts as a fixed size array of const
 	 * cyclics. The implemented subscript
 	 * operator computes 'i mod CYC_TYPE' (non-neg)
-	 * Thus, any subscript call is range-valid 
+	 * Thus, any subscript call is range-valid
 	 */
 	struct cyc_ar {
 		/**
 		 * @brief Subscript operator
-		 * 
+		 *
 		 * @param i index
 		 * @return i mod CYC_TYPE as const ref
 		 */
@@ -35,7 +36,7 @@ struct cyclic {
 		}
 		/**
 		 * @brief Subscript operator
-		 * 
+		 *
 		 * @param i index
 		 * @return i mod CYC_TYPE as const ref
 		 */
@@ -44,7 +45,7 @@ struct cyclic {
 		}
 		/**
 		 * @brief Subscript operator
-		 * 
+		 *
 		 * @param i index
 		 * @return i mod CYC_TYPE as const ref
 		 */
@@ -58,53 +59,54 @@ struct cyclic {
 		cyc_ar(){}
 		cyc_ar(const cyc_ar& o);
 		cyc_ar& operator=(const cyc_ar& o);
-		
+
 	};
 	friend class cyc_ar;
-	
+
 	//array of cycs as static const
 	//in wrapper type
     static const cyc_ar& VALS;
-    
+
     //type size
     static const unsigned int SIZE = sizeof(cyclic);
 	static unsigned int value(const _cyc_& c){
 		return (c.abs() - VALS.VALS->abs())/SIZE;
 	}
 	static const _c_ref def_val(){return VALS[0];}
-	
+
 	//add
 	friend _c_ref operator+(_c_ref c1, _c_ref c2){return VALS[(c1.abs()+c2.abs())/SIZE];}
 	friend _c_ref operator+(int c1, _c_ref c2){return VALS[c1]+c2;}
 	friend _c_ref operator+(_c_ref c1, int c2){return VALS[c2]+c1;}
 	friend _c_ref operator+(unsigned int c1, _c_ref c2){return VALS[c1]+c2;}
 	friend _c_ref operator+(_c_ref c1, unsigned int c2){return VALS[c2]+c1;}
-	
+
 	//sub
+	friend _c_ref operator-(_c_ref c1) {return VALS[0]-c1;}
 	friend _c_ref operator-(_c_ref c1, _c_ref c2){return VALS[((unsigned int) (c1.abs()-c2.abs())/SIZE)];}
 	friend _c_ref operator-(int c1, _c_ref c2){return VALS[c1]-c2;}
 	friend _c_ref operator-(_c_ref c1, int c2){return c1-VALS[c2];}
 	friend _c_ref operator-(unsigned int c1, _c_ref c2){return VALS[c1]-c2;}
 	friend _c_ref operator-(_c_ref c1, unsigned int c2){return c1-VALS[c2];}
-	
+
 	//mul
 	friend _c_ref operator*(_c_ref c1, _c_ref c2){return VALS[(c1.abs()*c2.abs())/SIZE];}
 	friend _c_ref operator*(int c1, _c_ref c2){return VALS[c1]*c2;}
 	friend _c_ref operator*(_c_ref c1, int c2){return VALS[c2]*c1;}
 	friend _c_ref operator*(unsigned int c1, _c_ref c2){return VALS[c1]*c2;}
 	friend _c_ref operator*(_c_ref c1, unsigned int c2){return VALS[c2]*c1;}
-	
+
 	//mod
 	//TODO unit as c2 should return zero...
 	friend _c_ref operator%(_c_ref c1, _c_ref c2){return &c1>&c2?(c1-c2)%c2:c1;}
-	
+
 	//div
 	//TODO: division not well defined in that only units are valid divisors,
-	//TODO: zero divisors 
+	//TODO: zero divisors
 	friend _c_ref operator/(_c_ref c1, _c_ref c2){
 		return 	value(c2)%CYC_TYPE==0?
 					value(c1)%CYC_TYPE==0?VALS[0]:VALS[0]:VALS[0];
-	}	
+	}
 	bool is_unit() const {return gcd(CYC_TYPE,value(*this))==1u?true:false;}
 private:
     cyclic(){}
@@ -196,10 +198,10 @@ struct cyc_map {
 	static const cyc_map<CYC_TYPE1, CYC_TYPE2 >& MAP;
 	const val_type& operator()(const arg_type& arg) const {
 		return val_type::VALS[0];
-					
+
 	}
 private:
-	
+
 };
 /***********************************************************************************
  *																				   *
@@ -242,4 +244,6 @@ const cyclic<2u >& operator-(const cyclic<2u >& c1, const cyclic<2u >& c2) ;//{r
 const cyclic<2u >& operator*(const cyclic<2u >& c1, const cyclic<2u >& c2) ;//{return cyclic<1u >::VALS;}
 
 std::ostream& operator<<(std::ostream& o, const cyclic<1u >& c);
+
+} /*alg_fun*/
 #endif /* _H_CYCLICS_HPP */

@@ -79,24 +79,41 @@ template<typename T, typename U >
 const U& semi_group<T,U>::OPERATION = U();
 template<typename T, typename U >
 const assoc<T,U >& semi_group<T,U >::ASS_DIAGRAM = assoc<T,U>(semi_group<T,U>::OPERATION);
-template<typename MONOID , typename BINARY >
+template<typename MONOID , typename BINARY , typename UNIT = unit<MONOID> >
 struct unital_associative : public assoc<MONOID, BINARY > {
 	typedef assoc<MONOID,BINARY > _base;
-	static const unit<MONOID >& UNIT;
+	static const UNIT& UNIT;
 
 	unital_associative(const BINARY& bin):_base(bin){}
 
 };
-template<typename MONOID , typename BINARY >
-class monoid : public cat::cat<unital_associative<MONOID, BINARY > > {
+template<typename MONOID , typename BINARY , typename UNIT = unit<MONOID> >
+class monoid : public cat::cat<unital_associative<MONOID, BINARY,UNIT > > {
 public:
-	static const unital_associative<MONOID, BINARY >& MONOID_DIAGRAM;
+	static const unital_associative<MONOID, BINARY, UNIT >& MONOID_DIAGRAM;
 };
-template<typename MONOID, typename BINARY >
-const unital_associative<MONOID,BINARY >& monoid<MONOID,BINARY >::MONOID_DIAGRAM =
-	unital_associative<MONOID,BINARY >(BINARY());
+template<typename MONOID, typename BINARY, typename UNIT >
+const unital_associative<MONOID,BINARY,UNIT >& monoid<MONOID,BINARY,UNIT >::MONOID_DIAGRAM =
+	unital_associative<MONOID,BINARY,UNIT >(BINARY());
 template<typename MONOID, typename BINARY >
 class mon_2_semi {
+
+};
+template<typename GROUP, typename ANTI >
+struct antipode {
+	static const ANTI& ANTIPODE;
+	GROUP operator()(const GROUP& g) const {return ANTIPODE(g);}
+};
+template<typename GROUP, typename BINARY,
+	typename UNIT = unit<GROUP >,
+	typename ANTI = antipode<GROUP,ANTI> >
+struct group_diag : public unital_associative<GROUP, BINARY, UNIT > {
+
+};
+template<typename GROUP, typename BINARY,
+typename UNIT = unit<GROUP >,
+typename ANTI = antipode<GROUP,ANTI> >
+class group : public cat::cat<group_diag<GROUP,BINARY,UNIT,ANTI > > {
 
 };
 } /* alg */

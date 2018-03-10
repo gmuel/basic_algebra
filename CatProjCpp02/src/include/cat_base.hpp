@@ -123,28 +123,44 @@ protected:
 /**
  * @brief Generic morphism template
  */
-template<typename _pre, typename _im , typename MORPHISM >
+template<typename _pre, typename _im , typename MORPHISM = morph<_pre,_im, MORPHISM > >
 struct morph {
 	typedef _im image;
 	image operator()(const _pre& arg) const ;//{return IMAGE;}
 //	static const _im& IMAGE;
+	static const MORPHISM& MORPH;
 	~morph(){}
 protected:
 	morph(){}
 	template<typename _pr1, typename _im1 , typename MORPHISM1 >
 	morph(const morph<_pr1, _im1, MORPHISM1 >& o){}//;
 };
+template<typename _pre, typename _im, typename MORPHISM >
+const MORPHISM& morph<_pre,_im, MORPHISM >::MORPH = MORPHISM();
 
 template<typename _pre, typename _im , typename MORPHISM>
 struct morph<_pre,const _im& , const MORPHISM& > {
 	typedef const _im& image;
 	image operator()(const _pre& arg) const ;//{return IMAGE;}
 //	static const _im& IMAGE;
+	static const MORPHISM& MORPH;
 	~morph(){}
 protected:
 	morph(){}
 	template<typename _pr1, typename _im1, typename MORPHISM1 >
 	morph(const morph<_pr1, const _im1& , const MORPHISM1& >& o){}
+};
+template<typename _pre, typename _image1, typename _image2 >
+struct composite : public morph<_pre, _image2, composite<_pre, _image1, _image2 > > {
+	typedef morph<_pre, image2, composite<pre,image1,image2 > > _base;
+	struct first_morph : public morph<_pre, _image1 > {
+
+	} first_morphism;
+	struct second_morph : public morph<_image1, _image2 > {
+
+	} second_morph;
+	composite():first_morphism(),second_morph(){}
+	~composite(){}
 };
 
 

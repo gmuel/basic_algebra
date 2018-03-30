@@ -80,6 +80,8 @@ struct cyclic {
 	friend _c_ref operator+(_c_ref c1, int c2){return VALS[c2]+c1;}
 	friend _c_ref operator+(unsigned int c1, _c_ref c2){return VALS[c1]+c2;}
 	friend _c_ref operator+(_c_ref c1, unsigned int c2){return VALS[c2]+c1;}
+	//friend _c_ref operator+(unsigned int c1, const _cyc_* c2){return c2==0?VALS[0]:(*c2) + VALS[c1];}
+	//friend _c_ref operator+(const _cyc_* c1, unsigned int c2){return c1==0?VALS[0]:VALS[c2]+(*c1);}
 
 	//sub
 	friend _c_ref operator-(_c_ref c1) {return VALS[0]-c1;}
@@ -182,13 +184,6 @@ std::ostream& operator<<(std::ostream& o, const cyclic<CYC_TYPE >& c){
    return o << cyclic<CYC_TYPE >::value(c) << " mod " << CYC_TYPE;
 }
 
-//pointer arith
-//TODO relies on add-operator, null ptr just returned
-template<unsigend int CYC_TYPE >
-const cyclic<CYC_TYPE >* operator+(const cyclic<CYC_TYPE >* s, unsigned int i){
-	return s==0?s:&s->operator+(i);
-}
-
 //TODO: should test for gcd(CYC_TYPE1,CYC_TYPE2)==1 or !=1, resp.
 //TODO: only valid for the latter (a compi-error would be nice as indication)
 template<unsigned int CYC_TYPE1, unsigned int CYC_TYPE2 >
@@ -217,6 +212,7 @@ struct cyclic<0u > {
 	friend cyclic<0u> operator+(const cyclic<0u>& s1, const cyclic<0u>& s2);
 	friend cyclic<0u> operator-(const cyclic<0u>& s1, const cyclic<0u>& s2);
 	friend cyclic<0u> operator*(const cyclic<0u>& s1, const cyclic<0u>& s2);
+	static unsigned int value(const  cyclic<0u >& s);
 	template<unsigned int CYC >
 	struct project {
 		const cyclic<CYC >& operator()(const cyclic<0u>& arg) const {return cyclic<CYC >::VALS[arg];}

@@ -38,8 +38,11 @@ struct set : public cat<eq_diag<SET_TYPE > > {
 		eq(const eq& o);
 		eq& operator=(const eq& o);
 	};
+	struct empty_morph : public morph<SET_TYPE,const empty&,empty_morph > {
+
+	};
 	static const eq& EQUAL;
-	static const morph<SET_TYPE , const empty& >& EMPTY;
+	static const empty_morp& EMPTY;
 
 };
 
@@ -47,7 +50,7 @@ template <typename SET_TYPE >
 const typename set<SET_TYPE >::eq& set<SET_TYPE >::EQUAL = set<SET_TYPE >::eq();
 
 template<typename SET_TYPE >
-const morph<SET_TYPE, const empty& >& set<SET_TYPE >::EMPTY = morph<SET_TYPE,const empty& >();
+const typename set<SET_TYPE >::empty_morph& set<SET_TYPE >::EMPTY = set<SET_TYPE >::empty_morph();
 
 template<typename _type >
 bool operator==(const _type& t1, const _type& t2) {
@@ -72,27 +75,6 @@ struct pointed : public set<SPACE_TYPE > {
 	static const pointed_obj<SPACE_TYPE >& OBJECT;
 };
 
-/**
- * @brief Generic morphism template spec for empty set {@link empty}
- *
- * Modelled as a singleton class - each class has one instance
- * {@link morph::MAP}
- */
-template<typename _pre >
-struct morph<_pre,const empty& > {
-	typedef morph<_pre,const empty&> _type;
-	typedef const empty& image;
-	image operator()(const _pre& arg) const ;//{return IMAGE;}
-//	static const _im& IMAGE;
-	~morph(){}
-	static const _type& MAP;
-private:
-	morph(){}
-	template<typename _pr1, typename _im1 >
-	morph(const morph<_pr1, _im1 >& o){}//;
-};
-template<typename _pre >
-const morph<_pre, const empty& >& morph<_pre, const empty& >::MAP = _type();
 
 } /*cat*/
 

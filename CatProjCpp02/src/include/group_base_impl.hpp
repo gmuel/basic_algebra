@@ -13,8 +13,23 @@
 //test implementation
 namespace alg {
 
-using namespace alg_fun;
+template<typename T >
+struct flip : public cat::morph<T,T,flip<T > > {
+	cat::pair<T > operator()(const cat::pair<T >& pr) const {
+		return cat::pair<T >(pr[1],pr[0]);
+	}
+	cat::pair<T > operator()(const T& t1, const T& t2) const {
+		return cat::pair<T > (t2,t1);
+	}
+};
 
+
+using namespace alg_fun;
+/**
+ * @brief Wrapper structure template for <tt>alg_fun::cyclic&ltN &gt</tt>
+ * @p Each instance is zero const-able, copy-const-able, etc.
+ * @tparam N group order
+ */
 template<unsigned int N >
 struct cyclic_wrp {
 	typedef cyclic<N > _cyclic;
@@ -36,7 +51,7 @@ private:
 	const cyclic<N>* ptr;
 };
 template<unsigned int N>
-struct cyclic_add : public binary<cyclic_wrp<N >, cyclic_add<cyclic_wrp<N> > > {
+struct cyclic_add : public binary<cyclic_wrp<N >, cyclic_add<N > > {
 	typedef cyclic_wrp<N > _cyclic;
 	_cyclic operator()(const _cyclic& c1, const _cyclic& c2) const {
 		return cyclic_wrp<N >((*c1)+(*c2));
@@ -47,7 +62,7 @@ struct cyclic_add_unit : public unit<cyclic_wrp<N > > {
 	typedef cyclic_wrp<N > _cyclic;
 	template<typename U >
 	_cyclic operator()(const U& u) const {
-		return _cyclic;
+		return _cyclic();
 	}
 };
 template<unsigned int N >
@@ -57,8 +72,17 @@ struct cyclic_add_anti : public antipode<cyclic_wrp<N >, cyclic_add_anti<N > > {
 		return _cyclic(-(*c1));
 	}
 };
+template<unsigned int N >
+struct cyclic_group_diag : public alg::group_diag<cyclic_wrp<N >,
+	cyclic_add<N >, cyclic_add_anti<N >,cyclic_add_unit<N > > {
 
+};
 
+template<unsigned int N >
+struct cyclic_group : public group<cyclic_wrp<N >,
+cyclic_add<N >, cyclic_add_anti<N >,cyclic_add_unit<N > > {
+
+};
 
 
 

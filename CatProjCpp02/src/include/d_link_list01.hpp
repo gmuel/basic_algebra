@@ -693,7 +693,7 @@ protected:
 	 * @param e terminal iterator
 	 */
 	template<class INPUT_ITER >
-	explicit d_linked_exp_list(INPUT_ITER& i, const INPUT_ITER& e):
+	explicit d_linked_exp_list(INPUT_ITER i, INPUT_ITER e):
 		entry_array(0),
 		first(0),last(0),
 		size(0),has_const_iterator(0),has_muta_iterator(0){
@@ -734,7 +734,7 @@ protected:
 				ii.insert(*i, count,true);
 				++i; ++count;
 			}
-			const u_int& lst_idx = ii->idx() + 1;
+			const u_int& lst_idx = ii.operator ->()->idx() + 1;
 			if(size!=count)
 				size = count;
 			init_array();
@@ -1495,14 +1495,14 @@ public:
 			iterator i1 = begin(), i2 = rbegin(), e = end();
 			while (i1!=e||i2!=e){
 				if(i1!=e) {
-					if(i1->idx()<idx) ++i1;
+					if(i1.operator ->()->idx()<idx) ++i1;
 					else break;
 				}
 				if(i2!=e){
-					if(i2->idx()>idx) --i2;
+					if(i2.operator ->()->idx()>idx) --i2;
 					else break;
 				}
-				if(i1->idx()>=i2->idx()) break;
+				if(i1.operator ->()->idx()>=i2.operator ->()->idx()) break;
 			}
 			if(i1!=e) return i1;
 			if(i2!=e) return i2;

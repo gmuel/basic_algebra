@@ -324,12 +324,11 @@ public:
 	static const T& CLASS_INST_REF;
 	template<typename U >
 	data_equal<U > begin_eq() const {
-		return data_equal<U >;
+		return data_equal<U >();
 	}
-	template< >
 	data_equal<void > begin_eq() const {return end_eq();}
 
-	data_equal<void > end_eq() const {return data_equal<void >;}
+	data_equal<void > end_eq() const {return data_equal<void >();}
 	bool run() {
 		return true;
 	}

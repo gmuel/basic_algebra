@@ -1,5 +1,5 @@
 //#include <iostream>
-#include "cyclics.hpp"
+#include "../include/cyclics.hpp"
 //extern class std::ostream o;
 namespace alg_fun {
 const cyclic<1u >& cyclic<1u >::VALS = cyclic<1u >();

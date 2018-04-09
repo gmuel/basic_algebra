@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#define _USE_CYCLICS = 1
 using namespace std;
 #ifdef _USE_LISTS_N_TESTS
 #include "../include/test_util.hpp"

@@ -3,6 +3,8 @@
 #include "d_link_list01.hpp"
 
 namespace util {
+extern std::ostream std::cerr;
+extern std::ostream std::cout;
 //TODO: check iterator class and its members
 //TODO:
 //TODO: move all mutator members of 'util::d_link_exp<const X&>' to
@@ -350,10 +352,10 @@ public:
 		return !(i1==i2);
 	}
 };
-
+/*
 template<class X >
 const X& d_link_exp<const X& >::DEFAULT_VAL = X::def_val();
-
+*/
 /**
  * @brief The doubly linked expandable list template
  *
@@ -548,8 +550,8 @@ protected:
 			entry_array[ptr->index] = ptr;
 			ptr = ptr->next;
 		}
-		if(ptr&&ptr->index>=size)
-			std::cerr << "Size violation!\nmax_size = " << size << "last index" << ptr->index+1 <<"\n";
+		//if(ptr&&ptr->index>=size)
+			//std::cerr << "Size violation!\nmax_size = " << size << "last index" << ptr->index+1 <<"\n";
 	}
 	/**
 	 * @brief Auxiliary member
@@ -640,7 +642,7 @@ protected:
 				ii.insert(*i, count,true);
 				++i; ++count;
 			}
-			const u_int& lst_idx = ii->idx() + 1;
+			const u_int& lst_idx = ii.operator ->()->idx() + 1;
 			if(size!=count)
 				size = count;
 			init_array();
@@ -676,13 +678,13 @@ public:
 			last = 0;
 		}
 		if(has_const_iterator) {
-			std::cout << "util::d_linked_exp_list<const X& >::const_iterator instance still alive - deleting\n";
+			//std::cout << "util::d_linked_exp_list<const X& >::const_iterator instance still alive - deleting\n";
 			if(has_const_iterator->child) {delete has_const_iterator->child;has_const_iterator->child = 0;}
 			delete has_const_iterator;
 			has_const_iterator = 0;
 		}
 		if(has_muta_iterator) {
-			std::cout << "util::d_linked_exp_list<const X& >::iterator instance still alive - deleting\n";
+			//std::cout << "util::d_linked_exp_list<const X& >::iterator instance still alive - deleting\n";
 			if(has_muta_iterator->child) {delete has_muta_iterator->child;has_muta_iterator->child = 0;}
 			delete has_muta_iterator;
 			has_muta_iterator = 0;
@@ -1401,14 +1403,14 @@ public:
 			iterator i1 = begin(), i2 = rbegin(), e = end();
 			while (i1!=e||i2!=e){
 				if(i1!=e) {
-					if(i1->idx()<idx) ++i1;
+					if(i1.operator ->()->idx()<idx) ++i1;
 					else break;
 				}
 				if(i2!=e){
-					if(i2->idx()>idx) --i2;
+					if(i2.operator ->()->idx()>idx) --i2;
 					else break;
 				}
-				if(i1->idx()>=i2->idx()) break;
+				if(i1.operator ->()->idx()>=i2.operator ->()->idx()) break;
 			}
 			if(i1!=e) return i1;
 			if(i2!=e) return i2;

@@ -8,7 +8,7 @@
  * Currently, only option 2 is supported as the author
  * has no way of deal with const refs in std::(map, pair, ...)
  * as type parameters. A const pointer version might follow sometime...
- * TODO -> 
+ * TODO ->
  */
 #include "cyclics.hpp"
 #ifndef _H_C_ADIC_USE_STD
@@ -18,7 +18,7 @@
 #ifndef D_LINK_LIST_H01_CONST_REF_SPEC
 #define D_LINK_LIST_H01_CONST_REF_SPEC
 #endif
-#include "d_link_list01.h"
+#include "d_link_list01.hpp"
 #else
 #include <map>
 #include <utility>
@@ -43,21 +43,23 @@ typedef unsigned int _u_int;
 template<_u_int CYC_TYPE >
 class c_adic {
 public:
-	typedef cyclic<CYC_TYPE > _cyc;
-	typedef c_adic<CYC_TYPE > _cad;
+	typedef alg_fun::cyclic<CYC_TYPE > _cyc;
+	typedef const _cyc&			  _cyc_cref;
+	typedef c_adic<CYC_TYPE > 		   _cad;
+	typedef util::d_linked_exp_list<_cyc_cref > _glist;
 	/**
 	 * @brief List class
 	 *
 	 * Spec of 'util::d_linked_exp_list<const cyclic<CYC_TYPE >& >'
 	 */
-	typedef class c_list : public util::d_linked_exp_list<const cyclic<CYC_TYPE >& > {
+	typedef class c_list : public _glist {
 	public:
-		typedef util::d_linked_exp_list<const cyclic<CYC_TYPE >& > 	_base;
+		typedef _glist 	_base;
 		typedef typename _base::const_iterator					  _c_iter;
 		typedef typename _base::iterator						    _iter;
 		//TODO might need special iterators capable of ignoring/skipping zero values
 		c_list(const _base& o):_base(){
-			init(o.begin(), o.end(),0);	
+			init(o.begin(), o.end(),0);
 		}
 		~c_list(){}
 	private:
@@ -124,10 +126,10 @@ public:
 			if(-((int )CYC_TYPE)<v&&v<0) coeffs.begin().insert(_cyc::VALS[CYC_TYPE-v],0);
 			else{
 				set_coef(v);
-			}			
+			}
 		}*/
 	}
-	c_adic(_u_int i, const cyclic<CYC_TYPE >& c):coeffs(){if(&c!=_cyc::VALS) coeffs.begin().insert(c,i);}
+	c_adic(_u_int i, _cyc_cref c):coeffs(){if(&c!=_cyc::VALS) coeffs.begin().insert(c,i);}
 	template<typename INPUT_ITER >
 	c_adic (INPUT_ITER i, INPUT_ITER e, _u_int idx_hint = 0):coeffs(i,e,idx_hint){}
 	c_adic(const c_adic<CYC_TYPE >& o):coeffs(o.coeffs){}
@@ -148,9 +150,9 @@ public:
 			if(sz1>sz2) {sum = c1; lst = &c2;}
 			else {sum = c2; lst = &c1;}
 			_c_iter i = lst->coeffs.begin(), e = lst->coeffs.end();
-			for( i; i!=e; ++i){
+			for( ; i!=e; ++i){
 				_iter ii = sum.coeffs.find(i.id());
-				if(ii==sum.coeffs.end()) sum.coeff.begin().insert(*i,i.idx());
+				if(ii==sum.coeffs.end()) sum.coeffs.begin().insert(*i,i.idx());
 				else {
 					const _cyc& sm = (*ii) + (*i);
 					if(sm<*ii||sm<*i) sum = sum + c_adic<CYC_TYPE >(i.idx()+1,1);
@@ -182,11 +184,11 @@ public:
 		if(sz1>sz2) {mn = &c2;sum = c1;}
 		else {mn = & c1; sum = c2;}
 		_c_iter i = mn->begin(), e = mn->end();
-		
-		
+
+
 	}*/
 	friend _cad operator*(const _cad& c1, const _cad& c2) {
-		
+		return _cad();
 	}
 	friend std::ostream& operator<<(std::ostream& o, const _cad& c){
 		_c_iter i = c.begin(), e = c.end();
@@ -220,8 +222,14 @@ private:
 			//else
 			set_coef(1,v/CYC,iii);
 			coeffs.set_array();
-		}	
-	}/*
+		}
+	}
+	void set_coef(_u_int i, _cyc_cref val){
+		if(val!=_cyc::VALS[0]) {
+			coeffs.insert(i,val);
+		}
+	}
+	/*
 	void set_coef(_u_int i, int v, _iter& iii){
 		if(v!=0) {
 			int ii = v>=0?v%CYC:(CYC+(v%CYC));

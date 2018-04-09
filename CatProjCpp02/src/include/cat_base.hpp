@@ -119,11 +119,12 @@ struct object {
 protected:
 	object(){}
 };
-
+template<typename _pre, typename _im, typename MORPHISM  >
+struct morph;
 /**
  * @brief Generic morphism template
  */
-template<typename _pre, typename _im , typename MORPHISM = morph<_pre,_im, MORPHISM > >
+template<typename _pre, typename _im , typename MORPHISM >
 struct morph {
 	typedef _im image;
 	image operator()(const _pre& arg) const ;//{return IMAGE;}
@@ -152,11 +153,11 @@ protected:
 };
 template<typename _pre, typename _image1, typename _image2 >
 struct composite : public morph<_pre, _image2, composite<_pre, _image1, _image2 > > {
-	typedef morph<_pre, image2, composite<pre,image1,image2 > > _base;
-	struct first_morph : public morph<_pre, _image1 > {
+	typedef morph<_pre, _image2, composite<_pre,_image1,_image2 > > _base;
+	struct first_morph : public morph<_pre, _image1, first_morph > {
 
 	} first_morphism;
-	struct second_morph : public morph<_image1, _image2 > {
+	struct second_morph : public morph<_image1, _image2, second_morph > {
 
 	} second_morph;
 	composite():first_morphism(),second_morph(){}
@@ -173,7 +174,7 @@ struct functor {
 
 	} _im;
 	template<typename PRE_OBJ, typename IM_OBJ >
-	typedef struct morph_im : public morph<PRE_OBJ, IM_OBJ, morph<PRE_OBJ, IM_OBJ> > {
+	struct morph_im : public morph<PRE_OBJ, IM_OBJ, morph_im<PRE_OBJ, IM_OBJ> > {
 
 	};
 };

@@ -85,6 +85,8 @@ private:
 	pair(const _type& s, const _type& t):first(s),second(t){}
 	pair(const pair<_type >& o):first(o.first),second(o.second){}
 	~pair(){}
+	const _type& operator[](int i) const {return i%2==0?first:second;}
+	_type& operator[](int i) {return i%2==0?first:second;}
 private:
 	_type first, second;
 

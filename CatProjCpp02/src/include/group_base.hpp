@@ -133,8 +133,25 @@ template<typename GROUP, typename BINARY,
 typename ANTI,
 typename UNIT = unit<GROUP > >
 class group : public cat::cat<group_diag<GROUP,BINARY,UNIT,ANTI > > {
+public:
+	typedef group_diag<GROUP,BINARY,UNIT,ANTI > 	_grp_diag;
+	typedef unital_associative<GROUP,BINARY,UNIT >	_mon_diag;
+protected:
+	typedef GROUP (*multiply)(const GROUP& g1, const GROUP& g2) const;
+	static const multiply MUL = BINARY::operator();
+	typedef GROUP (*unit) () const ;
+};
+template<typename GROUP, typename BINARY,
+typename ANTI,
+typename UNIT = unit<GROUP > >
+struct forget : public cat::functor<group_diag<GROUP,BINARY,ANTI,UNIT >, cat::eq_diag<GROUP > > {
 
 };
+/*template<typename GROUP, typename BINARY,
+typename ANTI,
+typename UNIT >
+const group<GROUP,BINARY,ANTI,UNIT >::multiply group<GROUP,BINARY,ANTI,UNIT >::MUL
+	= BINARY::operator();*/
 } /* alg */
 
 #endif /*  H_GROUP_BASE_HPP */

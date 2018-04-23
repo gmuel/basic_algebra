@@ -22,6 +22,14 @@ struct flip : public cat::morph<T,T,flip<T > > {
 		return cat::pair<T > (t2,t1);
 	}
 };
+template<typename GROUP,
+		typename BINARY,
+		typename ANTI,
+		typename UNIT>
+class abelian_diag : public group_diag<GROUP, BINARY, ANTI,UNIT > {
+public:
+	bool operator()(const GROUP& g1, const GROUP& g2) const {return g2*g1 == g1*g2;}
+};
 
 
 using namespace alg_fun;

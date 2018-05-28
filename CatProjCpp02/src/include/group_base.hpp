@@ -63,7 +63,7 @@ struct assoc : public cat::eq_diag<teriary<T, left_hand<T,BINARY > > > {
 		return left(a,b,c)==right(a,b,c);
 	}
 private:
-	const BINARY operation;
+	const BINARY 				operation;
 	const left_hand<T,BINARY> 	left;
 	const right_hand<T,BINARY > right;
 

@@ -137,9 +137,9 @@ public:
 	typedef group_diag<GROUP,BINARY,UNIT,ANTI > 	_grp_diag;
 	typedef unital_associative<GROUP,BINARY,UNIT >	_mon_diag;
 protected:
-	typedef GROUP (*multiply)(const GROUP& g1, const GROUP& g2) const;
+	typedef GROUP (BINARY::*multiply)(const GROUP& g1, const GROUP& g2) const;
 	static const multiply MUL = BINARY::operator();
-	typedef GROUP (*unit) () const ;
+	typedef GROUP (UNIT::*unit) () const ;
 };
 template<typename GROUP, typename BINARY,
 typename ANTI,

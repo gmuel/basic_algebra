@@ -38,7 +38,16 @@ struct n_bool {
 	 */
 	unsigned int value()const {return val;}
 	/**@brief Assignment operator*/
-	n_bool<N>& operator=(const n_bool<N>& t) {val = t.val;return *this;}
+	n_bool<N >& operator=(bool t) {
+		val = t?0u:1u;
+		return *this;
+	}
+	n_bool<N>& operator=(int t) {
+		val = t>=0?t%N:N+t%N;return *this;
+	}
+	/**@brief Assignment operator*/
+	template <unsigned int M>
+	n_bool<N>& operator=(const n_bool<M>& t) {val = M>N?t.val:t.val%N;return *this;}
 	/**@brief Intersection operator*/
 	friend n_bool<N > operator&&(const n_bool<N>& t1, const n_bool<N >& t2)
 	{
@@ -89,6 +98,8 @@ template< >struct n_bool<1 > {
 	 * integer interval [0,N]
 	 */
 	bool value()const ;/*{return val;}*/
+
+	n_bool<1 >& operator=(bool tt);
 	/**@brief Assignment operator*/
 	n_bool<1>& operator=(const n_bool<1 >& t);/* {val = t.val;return *this;}*/
 	/**@brief Intersection operator*/

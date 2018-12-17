@@ -1,14 +1,19 @@
+#!/usr/bin/make -f
+
+#change permissions to 7** to use mk-file as script
+
 SRC=src
-SRC1=$(SRC)/include
-SRC2=$(SRC)/lib
+INC=$(SRC)/include
+LIB=$(SRC)/lib
 BIN=bin
+LIO=$(BIN)/lib
 CC=g++
-OBJ=$(BIN)/hbool.o
-TAR=$(BIN)/libhbools.so
+OBJ=$(LIO)/hbool.o
+TAR=$(LIO)/libhbools.so
 all : $(TAR)
 
 $(TAR) : $(OBJ)
 	$(CC) -shared -fPIC $< -o $@
 
-$(OBJ) : $(SRC2)/hyperbools.cpp $(SRC1)/hyperbools.hpp
+$(OBJ) : $(LIB)/hyperbools.cpp $(INC)/hyperbools.hpp
 	$(CC) -fPIC -c $< -o $@

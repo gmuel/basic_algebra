@@ -229,6 +229,21 @@ struct cyclic<1u > {
 	cr_1u operator[] (unsigned int) const ;/*{return VALS;}*/
 	cr_1u operator[] (int ) const ;/*{return VALS;}*/
 };
+template< >
+struct cyclic<2u > {
+	CYCLICS_HPP_TYPE_DEF_CREF(2u);
+    static const cyclic<2u > VALS[2];
+	static unsigned int value(cr_2u c);/*{return 0u;}*/
+	cr_2u operator[] (unsigned int) const ;/*{return VALS;}*/
+	cr_2u operator[] (int ) const ;/*{return VALS;}*/
+private :
+	cyclic(){}
+	cyclic(const cyclic<2u >& ){}
+	template<typename T >
+	cyclic<2u >& operator=(T t);
+	template<typename T >
+	cyclic<2u >& operator=(const T& t){return *this;}
+};
 const cyclic<1u >& operator+(const cyclic<1u >& c1, const cyclic<1u >& c2) ;//{return cyclic<1u >::VALS;}
 const cyclic<1u >& operator-(const cyclic<1u >& c1, const cyclic<1u >& c2) ;//{return cyclic<1u >::VALS;}
 const cyclic<1u >& operator*(const cyclic<1u >& c1, const cyclic<1u >& c2) ;//{return cyclic<1u >::VALS;}
@@ -238,6 +253,7 @@ const cyclic<1u >& operator*(const cyclic<1u >& c1, const cyclic<1u >& c2) ;//{r
 const cyclic<2u >& operator+(const cyclic<2u >& c1, const cyclic<2u >& c2) ;//{return cyclic<1u >::VALS;}
 const cyclic<2u >& operator-(const cyclic<2u >& c1, const cyclic<2u >& c2) ;//{return cyclic<1u >::VALS;}
 const cyclic<2u >& operator*(const cyclic<2u >& c1, const cyclic<2u >& c2) ;//{return cyclic<1u >::VALS;}
+
 
 std::ostream& operator<<(std::ostream& o, const cyclic<1u >& c);
 

@@ -19,5 +19,6 @@ CYCLICS_HPP_TYPE_DEF_CREF(10u);
 
 
 int main (){
-
+	cr_2u c1 = cyclic<2u >::VALS[0]
+				, c2 = cyclic<2u >::VALS[1];
 }

@@ -34,6 +34,25 @@ const cyclic<1u >& operator+(const cyclic<1u >& c1, const cyclic<1u >& c2) {retu
 const cyclic<1u >& operator-(const cyclic<1u >& c1, const cyclic<1u >& c2) {return cyclic<1u >::VALS;}
 
 const cyclic<1u >& operator*(const cyclic<1u >& c1, const cyclic<1u >& c2) {return cyclic<1u >::VALS;}
+typedef cyclic<2u >::cr_2u cr_2u;
+
+const cyclic<2u > cyclic<2u >::VALS[2];
+
+unsigned int 		cyclic<2u >::value		(const cyclic<2u >& c)	 {return c==cyclic<2u >::VALS[0]?0u:1u;}
+
+cr_2u 	cyclic<2u >::operator[] (unsigned int i) const {return cyclic<2u >::VALS[i%2u];}
+
+const cyclic<2u >& 	cyclic<2u >::operator[] (int i) const 		 {return cyclic<2u >::VALS[i>0?i%2u:2u+i%2u];}
+
+const cyclic<2u >& operator+(const cyclic<2u >& c1, const cyclic<2u >& c2) {return c1==c2?
+				cyclic<2u >::VALS[0]:
+					cyclic<2u >::VALS[1];}
+
+const cyclic<2u >& operator-(const cyclic<2u >& c1, const cyclic<2u >& c2) {return cyclic<2u >::VALS;}
+
+const cyclic<2u >& operator*(const cyclic<2u >& c1, const cyclic<2u >& c2) {return cyclic<2u >::VALS;}
+
+
 
 
 

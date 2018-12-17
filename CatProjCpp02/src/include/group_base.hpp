@@ -140,6 +140,7 @@ protected:
 	typedef GROUP (BINARY::*multiply)(const GROUP& g1, const GROUP& g2) const;
 	static const multiply MUL = BINARY::operator();
 	typedef GROUP (UNIT::*unit) () const ;
+	static const unit E = UNIT::operator();
 };
 template<typename GROUP, typename BINARY,
 typename ANTI,

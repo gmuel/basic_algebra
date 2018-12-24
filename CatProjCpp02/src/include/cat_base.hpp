@@ -36,7 +36,21 @@ protected:
 public:
 	~cat(){}
 };
+/**
+ * @brief Relation structure template
+ *
+ * Note that no definition of static member <code>rel::REL</code> is provided
+ * user definitions must provide their own definition of member
+ * @tparam REL_TYPE binary boolean valued function type
+ */
+template<typename TYPE1, typename TYPE2, typename REL_TYPE >
+struct rel {
+	static const REL_TYPE& REL;
+	bool operator()(const TYPE1& t1, const TYPE2& t2) const {return REL(t1,t2);}
+};
 
+template<typename TYPE, typename REL_NAME >
+struct reflexive;
 /**
  * @brief Relation class temp
  *
@@ -44,36 +58,66 @@ public:
  * as needed as a spec
  * @tparam TYPE
  * @tparam REL_TYPE could be implementing subclass
- */
-template<typename TYPE , typename REL_TYPE >
-struct rel {
-	bool operator()(const TYPE& t1, const TYPE& t2) const;
-};
 
+template<typename TYPE , typename REL_TYPE >
+struct rel<TYPE, TYPE, REL_TYPE > {
+	static const REL_TYPE& REL;
+	bool operator()(const TYPE& t1, const TYPE& t2) const {return REL(t1,t2);}
+};
+*/
 /**
  * @brief Reflexive relation class temp
  *
  * @tparam TYPE
  * @tparam REL_TYPE
  */
-template<typename TYPE  >
-struct reflexive : public rel<TYPE, reflexive<TYPE > > {
-	typedef rel<TYPE,reflexive<TYPE > > _base;
+template<typename TYPE , typename REL_NAME >
+struct reflexive : public rel<TYPE, TYPE, REL_NAME > {
+	typedef rel<TYPE,TYPE, REL_NAME > _base;
 
-	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t);}//should be true???
+	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t) == true;}
 };
 
 template<typename TYPE >
-struct symmetric : public rel<TYPE, symmetric<TYPE> > {
-	typedef rel<TYPE, symmetric<TYPE > > _base;
-	bool operator()(const TYPE& t1, const TYPE& t2) const {return _base::operator()(t1,t2)==_base::operator()(t2,t1);}
+struct reflexive<TYPE,reflexive >  : public rel<TYPE, TYPE, reflexive<TYPE,reflexive > > {
+	typedef rel<TYPE,TYPE, reflexive > _base;
+
+	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t) == true;}
 };
 
-template<typename TYPE >
-struct transitive : public rel<TYPE, transitive<TYPE > > {
-	typedef rel<TYPE,transitive<TYPE > > _base;
+template<typename TYPE, typename REL_NAME >
+struct symmetric : public rel<TYPE, TYPE, REL_NAME > {
+	typedef rel<TYPE, TYPE, REL_NAME  > _base;
+	bool operator()(const TYPE& t1, const TYPE& t2) const {
+		return _base::operator()(t1,t2) && _base::operator()(t2,t1);
+	}
+};
+
+template<typename TYPE, typename REL_NAME >
+struct transitive : public rel<TYPE, TYPE, REL_NAME > {
+	typedef rel<TYPE, TYPE, REL_NAME > _base;
 	bool operator()(const TYPE& t1, const TYPE& t2, const TYPE& t3) const {
-		return (this->_base::operator()(t1,t2) && this->_base::operator()(t2,t3))&&this->_base::operator()(t1,t3);
+		return _base::operator()(t1,t2) && _base::operator()(t2,t3) && _base::operator()(t1,t3);
+	}
+};
+
+template<typename TYPE, typename REL_NAME >
+struct eq : public rel<TYPE, TYPE, REL_NAME >{
+	typedef rel<TYPE, TYPE, REL_NAME  >  	_base;
+	typedef reflexive<TYPE, REL_NAME > 		_refl;
+	typedef symmetric<TYPE, REL_NAME > 		_symm;
+	typedef transitive<TYPE, REL_NAME >		_tran;
+
+	static const _refl& REFLEX;
+
+	static const _symm& SYMMETRIC;
+
+	static const _tran& TRANSITIVE;
+
+	bool operator()(const TYPE& t1, const TYPE& t2, const TYPE& t3) const {
+		return REFLEX(t1) && REFLEX(t2) && REFLEX(t3) &&
+					SYMMETRIC(t1,t2) && SYMMETRIC(t1,t3) && SYMMETRIC(t2,t3) &&
+						TRANSITIVE(t1,t2,t3);
 	}
 };
 
@@ -99,9 +143,9 @@ struct eq_diag {
 	struct diagonal {
 		_pair operator()(const _type& x) const {return _pair(x,x);}
 	};
-	struct equi : public reflexive<_type > {//?
-		bool operator()(const _pair& p) const ;//{return true;}
-		bool operator()(const _type& s, const _type& t) const ;//{return true;}
+	struct equi : public eq<_type, equi > {
+		bool operator()(const _pair& p) const {return eq<_type, equi >::_base::REL(p[0],p[1]);}
+		bool operator()(const _type& s, const _type& t) const {return eq<_type, equi >::_base::REL(s,t);}
 	};
 	~eq_diag(){}
 protected:
@@ -164,6 +208,11 @@ struct composite : public morph<_pre, _image2, composite<_pre, _image1, _image2 
 	~composite(){}
 };
 
+template<typename _pre_image, typename _image, typename _morph>
+struct pre_image : public eq_diag<pre_image<_pre_image,_image,_morph > > {
+
+
+};
 
 template<typename DIAG1, typename DIAG2 >
 struct functor {

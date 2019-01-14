@@ -2,10 +2,10 @@
 #define PAIRED_TYPE_HPP
 //currently using own type, may change 2 utility::pair
 
+namespace util {
+
 #ifdef PAIRED_TYPE_HPP_USING_STD_PAIR
 #include <utility>
-
-namespace util {
 
 //code for spec for singly typed pair from standard lib goes here
 template < typename _type >
@@ -24,80 +24,78 @@ struct pair : public std::pair<_type,_type> {//private inheritance???
 		
 	};
 };
-}
+
 #else
 
-namespace util {
 
-template< typename _type >
+template< typename _type1, typename _type2 = _type1  >
 struct pair{
 
 
 #ifdef PAIRED_TYPE_HPP_USING_HEAP
 	pair():first(0),second(0){}
 	//pair(const _type& s):first(new _type(s)),second(new _type(s)){}
-	pair(const _type& s, const _type& t):first(new _type(s)),second(new _type(t)){}
-	pair(const pair<_type >& o):first(o.first?new _type(*o.first):0),second(o.second?new _type(*o.second):0){}
+	static const struct proj1 {
+		const _type1& operator()(const pair<_type1,_type2>& arg) const {return arg.first;}
+		_type1& operator()(pair<_type1,_type2>& arg) const {return arg.first;}
+	}& P1;
+	static const struct proj2 {
+		const _type2& operator()(const pair<_type1,_type2>& arg) const {return arg.second;}
+		_type2& operator()(pair<_type1,_type2>& arg) const {return arg.second;}
+	}& P2;
+	friend class proj1;
+	friend class proj2;
+	pair(const _type1& s, const _type2& t):first(new _type(s)),second(new _type(t)){}
+	pair(const pair<_type >& o):first(o.first!=0?new _type(*o.first):0),second(o.second!=0?new _type(*o.second):0){}
 	~pair(){
 		if(first) {delete first; first=0;}
 		if(second) {delete second; second =0;}
 	}
-	const _type& operator[](int i) const {return i>=0?i%2==0?*first:*second:this->operator[](-i);}
-	struct iterator {
-		iterator& operator++() {
-			++i;
-			return *this;
-		}
-		iterator operator++(int) {
-			iterator ii(*this);
-			this->operator++();
-			return ii;
-		}
-		iterator& operator=(const iterator& ii) {
-			ptr = ii.ptr;
-			i = ii.i;
-			return *this;
-		}
-		iterator& operator=(const _type& t) {
-			if(i<2) {
-				if(i==0) {if(first) delete first; first = new _type(t);}
-				else {if(second) delete second; second = new _type(t);}
-			}
-			return *this;
-		}
-		friend bool operator==(const iterator& i1, const iterator& i2) {
-			return i1.ptr==i2.ptr?i1.i==i2.i:false;
-		}
-	private:
-		pair<_type >* ptr;
-		unsigned short i;
-		iterator(pair<_type >* pr, unsigned short ii = 0):ptr(pr),i(ii){}
+
+private:
+	_type1 * first;
+	_type2 * second;
+#else /*PAIRED_TYPE_HPP_USING_HEAP*/
+
+	struct proj1 {
+		const _type1& operator()(const pair<_type1,_type2>& arg) const {return arg.first;}
+		_type1& operator()(pair<_type1,_type2>& arg) const {return arg.first;}
 	};
-	iterator operator[](int i ) {
-		return i<0?this->operator[](-i):
-			iterator(this,(unsigned short) (i%3));
+	static const proj1& P1;
+	static const struct proj2 {
+		const _type2& operator()(const pair<_type1,_type2>& arg) const {return arg.second;}
+		_type2& operator()(pair<_type1,_type2>& arg) const {return arg.second;}
+	}& P2;
+	friend class proj1;
+	friend class proj2;
+
+	pair():first(_type1()),second(_type2()){}
+	//pair(const _type& s):first(s),second(s){}
+	pair(const _type1& s, const _type2& t):first(s),second(t){}
+	pair(const pair<_type1, typename _type2  >& o):first(o.first),second(o.second){}
+	~pair(){}
+	friend bool operator==(const pair<_type1,_type2>& p1, const pair<_type1,_type2>& p2) {
+		return p1.first==p2.first && p1.second == p2.second;
+	}
+	friend bool operator!=(const pair<_type1,_type2>& p1, const pair<_type1,_type2>& p2) {
+		return !(p1==p2);
 	}
 private:
-	_type* first,* second;
-#else /*PAIRED_TYPE_HPP_USING_HEAP*/
-	pair():first(0),second(0){}
-	//pair(const _type& s):first(s),second(s){}
-	pair(const _type& s, const _type& t):first(s),second(t){}
-	pair(const pair<_type >& o):first(o.first),second(o.second){}
-	~pair(){}
-	const _type& operator[](int i) const {return i%2==0?first:second;}
-	_type& operator[](int i) {return i%2==0?first:second;}
-private:
-	_type first, second;
+	_type1 first;
+	_type2 second;
 
-
-#endif /*PAIRED_TYPE_HPP_USING_HEAP*/
 };
 
+#endif /*PAIRED_TYPE_HPP_USING_HEAP*/
 
-}
+template<typename _type1, typename _type2 >
+const pair<_type1,_type2 >::proj1& pair<_type1,_type2 >::P1 = pair<_type1,_type2 >::proj1(); // @suppress("Type cannot be resolved")
+
+template<typename _type1, typename _type2 >
+const pair<_type1,_type2 >::proj2& pair<_type1,_type2 >::P2 = pair<_type1,_type2 >::proj2(); // @suppress("Type cannot be resolved")
 
 #endif
 
+} /*util*/
 
 #endif /*PAIRED_TYPE_HPP*/

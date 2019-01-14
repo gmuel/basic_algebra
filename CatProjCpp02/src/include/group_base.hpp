@@ -148,6 +148,35 @@ typename UNIT = unit<GROUP > >
 struct forget : public cat::functor<group_diag<GROUP,BINARY,ANTI,UNIT >, cat::eq_diag<GROUP > > {
 
 };
+
+template<typename DOM1, typename DOM2 >
+struct flip : public cat::morph<util::pair<DOM1,DOM2>, util::pair<DOM2,DOM1>,flip<DOM1,DOM2 > > {
+	typedef util::pair<DOM1,DOM2 > _pair1;
+	typedef util::pair<DOM2,DOM1 > _pair2;
+	_pair2 operator()(const _pair1& arg) const {return _pair2(_pair1::P2(arg),_pair1::P1(arg));}
+};
+
+template<typename GRP,
+typename BINARY,
+typename ANTI,
+typename UNIT = unit<GRP > >
+struct abel_diag : public group_diag<GRP,BINARY,ANTI,UNIT > {
+	static const flip<GRP,GRP >& FLIP;
+	bool operator()(const GRP& g, const GRP& h) const {return g*h==h*g;}
+};
+template<typename GRP,
+typename BINARY,
+typename ANTI,
+typename UNIT >
+const flip<GRP,GRP >& abel_diag<GRP,BINARY,ANTI,UNIT >::FLIP = flip<GRP,GRP > ();
+
+template<typename GRP,
+typename BINARY,
+typename ANTI,
+typename UNIT = unit<GRP > >
+struct abel : public cat::cat<abel_diag<GRP,BINARY, ANTI, UNIT > > {
+	typedef group<GRP,BINARY,ANTI,UNIT > _grp_bind;
+};
 /*template<typename GROUP, typename BINARY,
 typename ANTI,
 typename UNIT >

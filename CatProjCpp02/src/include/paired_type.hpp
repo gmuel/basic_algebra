@@ -72,7 +72,7 @@ private:
 	pair():first(_type1()),second(_type2()){}
 	//pair(const _type& s):first(s),second(s){}
 	pair(const _type1& s, const _type2& t):first(s),second(t){}
-	pair(const pair<_type1, typename _type2  >& o):first(o.first),second(o.second){}
+	pair(const pair<_type1,_type2  >& o):first(o.first),second(o.second){}
 	~pair(){}
 	friend bool operator==(const pair<_type1,_type2>& p1, const pair<_type1,_type2>& p2) {
 		return p1.first==p2.first && p1.second == p2.second;
@@ -89,10 +89,10 @@ private:
 #endif /*PAIRED_TYPE_HPP_USING_HEAP*/
 
 template<typename _type1, typename _type2 >
-const pair<_type1,_type2 >::proj1& pair<_type1,_type2 >::P1 = pair<_type1,_type2 >::proj1(); // @suppress("Type cannot be resolved")
+const typename pair<_type1,_type2 >::proj1& pair<_type1,_type2 >::P1 = pair<_type1,_type2 >::proj1(); // @suppress("Type cannot be resolved")
 
 template<typename _type1, typename _type2 >
-const pair<_type1,_type2 >::proj2& pair<_type1,_type2 >::P2 = pair<_type1,_type2 >::proj2(); // @suppress("Type cannot be resolved")
+const typename pair<_type1,_type2 >::proj2& pair<_type1,_type2 >::P2 = pair<_type1,_type2 >::proj2(); // @suppress("Type cannot be resolved")
 
 #endif
 

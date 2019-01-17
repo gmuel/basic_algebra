@@ -77,13 +77,14 @@ struct reflexive : public rel<TYPE, TYPE, REL_NAME > {
 
 	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t) == true;}
 };
-
-template<typename TYPE >
-struct reflexive<TYPE,reflexive >  : public rel<TYPE, TYPE, reflexive<TYPE,reflexive > > {
+/*
+template<class TYPE >
+struct reflexive<TYPE, reflexive<TYPE > >  : public rel<TYPE, TYPE, reflexive<TYPE > > {
 	typedef rel<TYPE,TYPE, reflexive > _base;
 
 	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t) == true;}
 };
+*/
 
 template<typename TYPE, typename REL_NAME >
 struct symmetric : public rel<TYPE, TYPE, REL_NAME > {

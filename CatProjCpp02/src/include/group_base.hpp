@@ -12,8 +12,11 @@ struct binary {
 		return OPERATION(t1,t2);
 	}
 };
+/*
 template<typename T, typename BI_OPER >
 const BI_OPER& binary<T,BI_OPER >::OPERATION = BI_OPER();
+*/
+
 template<typename T , typename TER_OPER>
 struct teriary {
 	static const TER_OPER& OPERATION;

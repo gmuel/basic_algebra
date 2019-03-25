@@ -51,8 +51,9 @@ template<unsigned int N>
 struct cyclic_add_unit : public unit<cyclic_wrp<N > > {
 	typedef cyclic_wrp<N > _cyclic;
 	template<typename U >
-	_cyclic operator()(const U& u) const {
-		return _cyclic();
+	const _cyclic& operator()(const U& u) const {
+		static _cyclic zero;
+		return zero;
 	}
 };
 template<unsigned int N >

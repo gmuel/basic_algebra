@@ -44,7 +44,8 @@ typename MND_BINARY,
 typename MND_UNIT,
 typename ABL_UNIT = unit<RNG > >
 struct uring : public cat::cat<uring_diag<RNG, ABL_BINARY, ABL_ANTI, MND_BINARY, MND_UNIT , ABL_UNIT > >{
-	typedef ring_diag<RNG, ABL_BINARY, ABL_ANTI, ABL_UNIT > 	_rng_bind;
+	typedef uring_diag<RNG, ABL_BINARY, ABL_ANTI, MND_BINARY, MND_UNIT , ABL_UNIT >	_urng_bing;
+	typedef ring_diag<RNG, ABL_BINARY, ABL_ANTI, ABL_UNIT > 						_rng_bind;
 };
 
 } /*alg*/

@@ -16,26 +16,7 @@ using namespace std;
 #endif
 
 
-/**
- * @brief Category class templ
- *
- * Accepts a diagram type as type parameter
- * @tparam DIAGRAMS a diagram type
- */
-template<	//typename OBJECT_CLASS,
-			//typename MORPH_BASE,
-			//typename ID_FUNC,
-			typename DIAG >
-class cat {
-	template<typename DIAGRAM >
-	cat(const cat<DIAGRAM >& o);
-	template<typename DIAGRAM >
-	cat<DIAG >& operator=(const cat<DIAGRAM >& o);
-protected:
-	cat(){}
-public:
-	~cat(){}
-};
+
 /**
  * @brief Relation structure template
  *
@@ -45,6 +26,7 @@ public:
  */
 template<typename TYPE1, typename TYPE2, typename REL_TYPE >
 struct rel {
+
 	static const REL_TYPE& REL;
 	bool operator()(const TYPE1& t1, const TYPE2& t2) const {return REL(t1,t2);}
 };
@@ -73,8 +55,8 @@ struct rel<TYPE, TYPE, REL_TYPE > {
  */
 template<typename TYPE , typename REL_NAME >
 struct reflexive : public rel<TYPE, TYPE, REL_NAME > {
-	typedef rel<TYPE,TYPE, REL_NAME > _base;
-
+	typedef rel<TYPE,TYPE, REL_NAME > 	_base;
+	typedef TYPE						_obj;
 	bool operator()(const TYPE& t) const {return this->_base::operator()(t,t) == true;}
 };
 /*
@@ -89,6 +71,7 @@ struct reflexive<TYPE, reflexive<TYPE > >  : public rel<TYPE, TYPE, reflexive<TY
 template<typename TYPE, typename REL_NAME >
 struct symmetric : public rel<TYPE, TYPE, REL_NAME > {
 	typedef rel<TYPE, TYPE, REL_NAME  > _base;
+
 	bool operator()(const TYPE& t1, const TYPE& t2) const {
 		return _base::operator()(t1,t2) && _base::operator()(t2,t1);
 	}
@@ -139,14 +122,15 @@ struct eq : public rel<TYPE, TYPE, REL_NAME >{
  */
 template<	typename SET_TYPE >
 struct eq_diag {
-	typedef SET_TYPE _type;
-	typedef pair< _type > _pair;
+	typedef SET_TYPE _obj;
+	typedef pair< _obj > _pair;
+
 	struct diagonal {
-		_pair operator()(const _type& x) const {return _pair(x,x);}
+		_pair operator()(const _obj& x) const {return _pair(x,x);}
 	};
-	struct equi : public eq<_type, equi > {
-		bool operator()(const _pair& p) const {return eq<_type, equi >::_base::REL(p[0],p[1]);}
-		bool operator()(const _type& s, const _type& t) const {return eq<_type, equi >::_base::REL(s,t);}
+	struct equi : public eq<_obj, equi > {
+		bool operator()(const _pair& p) const {return eq<_obj, equi >::_base::REL(p[0],p[1]);}
+		bool operator()(const _obj& s, const _obj& t) const {return eq<_obj, equi >::_base::REL(s,t);}
 	};
 	~eq_diag(){}
 protected:
@@ -163,6 +147,27 @@ struct object {
 	~object(){}
 protected:
 	object(){}
+};
+/**
+ * @brief Category class templ
+ *
+ * Accepts a diagram type as type parameter
+ * @tparam DIAGRAMS a diagram type
+ */
+template<	//typename OBJECT_CLASS,
+			//typename MORPH_BASE,
+			//typename ID_FUNC,
+			typename DIAG >
+class cat {
+	typedef typename DIAG::_obj	_obj;
+	template<typename DIAGRAM >
+	cat(const cat<DIAGRAM >& o);
+	template<typename DIAGRAM >
+	cat<DIAG >& operator=(const cat<DIAGRAM >& o);
+protected:
+	cat(){}
+public:
+	~cat(){}
 };
 template<typename _pre, typename _im, typename MORPHISM  >
 struct morph;

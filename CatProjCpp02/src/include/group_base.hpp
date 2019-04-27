@@ -84,16 +84,21 @@ class semi_group : public cat::cat<assoc<SEMI_GROUP,BINARY > > {
 public:
 	static const BINARY& 					OPERATION;
 	static const assoc<SEMI_GROUP,BINARY >&	ASS_DIAGRAM;
+	typedef SEMI_GROUP 	_s_group;
+	typedef BINARY		_bin;
 
 
 };
+#ifdef _GROUP_BASE_HPP_USE_DEFAULTS
 template<typename T, typename U >
 const U& semi_group<T,U>::OPERATION = U();
 template<typename T, typename U >
 const assoc<T,U >& semi_group<T,U >::ASS_DIAGRAM = assoc<T,U>(semi_group<T,U>::OPERATION);
+#endif
 template<typename MONOID , typename BINARY , typename _UNIT = unit<MONOID> >
 struct unital_associative : public assoc<MONOID, BINARY > {
 	typedef assoc<MONOID,BINARY > _base;
+	typedef UNIT	_unit;
 	static const _UNIT& UNIT;
 
 	unital_associative(const BINARY& bin):_base(bin){}
@@ -104,15 +109,18 @@ class monoid : public cat::cat<unital_associative<MONOID, BINARY,UNIT > > {
 public:
 	static const unital_associative<MONOID, BINARY, UNIT >& MONOID_DIAGRAM;
 };
+#ifdef _GROUP_BASE_HPP_USE_DEFAULTS
 template<typename MONOID, typename BINARY, typename UNIT >
 const unital_associative<MONOID,BINARY,UNIT >& monoid<MONOID,BINARY,UNIT >::MONOID_DIAGRAM =
 	unital_associative<MONOID,BINARY,UNIT >(BINARY());
+#endif
 template<typename MONOID, typename BINARY >
 class mon_2_semi {
 
 };
 template<typename GROUP, typename ANTI >
 struct antipode {
+	typedef ANTI	_ant;
 	static const ANTI& ANTIPODE;
 	GROUP operator()(const GROUP& g) const {return ANTIPODE(g);}
 };
@@ -123,6 +131,8 @@ struct group_diag : public unital_associative<GROUP, BINARY, UNIT > {
 	bool operator()(const GROUP& g) const {
 		return g/g == unit<GROUP >::UNIT;
 	}
+	typedef unital_associative<GROUP,BINARY,UNIT > 	_u_assc;
+	typedef  antipode<GROUP,ANTI >					_ant;
 };
 template<typename GROUP, typename BINARY >
 GROUP operator*(const GROUP& g1, const GROUP& g2) {
@@ -167,18 +177,20 @@ struct abel_diag : public group_diag<GRP,BINARY,ANTI,UNIT > {
 	static const flip<GRP,GRP >& FLIP;
 	bool operator()(const GRP& g, const GRP& h) const {return g*h==h*g;}
 };
+#ifdef _GROUP_BASE_HPP_USE_DEFAULTS
 template<typename GRP,
 typename BINARY,
 typename ANTI,
 typename UNIT >
 const flip<GRP,GRP >& abel_diag<GRP,BINARY,ANTI,UNIT >::FLIP = flip<GRP,GRP > ();
-
+#endif /*_GROUP_BASE_HPP_USE_DEFAULTS*/
 template<typename GRP,
 typename BINARY,
 typename ANTI,
 typename UNIT = unit<GRP > >
 struct abel : public cat::cat<abel_diag<GRP,BINARY, ANTI, UNIT > > {
-	typedef group<GRP,BINARY,ANTI,UNIT > _grp_bind;
+	typedef group<GRP,BINARY,ANTI,UNIT > 			_grp_bind;
+	typedef abel_diag<GRP,BINARY, ANTI, UNIT > 		_abl_bind;
 };
 /*template<typename GROUP, typename BINARY,
 typename ANTI,

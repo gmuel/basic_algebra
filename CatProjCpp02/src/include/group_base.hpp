@@ -174,6 +174,7 @@ typename BINARY,
 typename ANTI,
 typename UNIT = unit<GRP > >
 struct abel_diag : public group_diag<GRP,BINARY,ANTI,UNIT > {
+	typedef group_diag<GRP,BINARY,ANTI,UNIT > _grp_bind;
 	static const flip<GRP,GRP >& FLIP;
 	bool operator()(const GRP& g, const GRP& h) const {return g*h==h*g;}
 };

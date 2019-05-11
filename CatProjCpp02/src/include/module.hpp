@@ -8,7 +8,7 @@
 #ifndef INCLUDE_MODULE_HPP_
 #define INCLUDE_MODULE_HPP_
 #include "ring_base.hpp"
-
+#include <map>
 namespace alg {
 /**
  * @brief Generic left module diagram structure template
@@ -172,8 +172,124 @@ struct mod : public cat::cat<mod_diag<M,BINARY,ANTI,LSCAL,RSCAL,UNIT > > {
 };
 
 
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename LSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct l_noeth_diag : public lmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >  {
+
+	typedef lmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >	_lmod_bind;
+	using _lmod_bind::LEFT;
+	using _lmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
+	typedef GENS	_gen;
+	struct embed {
+		embed(const _gen& g, const M& m):_g(g),_m(m){}
+		embed(const embed& o):_g(o._g),_m(o._m){}
+		~embed(){}
+		M operator()(const _gen& g) const {
+			return g==_g?_m:_lmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT(_m);
+		}
+		M operator()(const BASE_RNG& r) const {return _lmod_bin::LEFT(r,this->operator()(_g));}
+		const _gen& operator()() const {return _g;}
+	private:
+		const _gen& _g;
+		const M&	_m;
+	};
+	typedef	std::map<_gen,embed >	_gen_map;
 
 
+};
+
+
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename LSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct l_noeth : public cat::cat<l_noeth_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,GENS, UNIT > > {
+	typedef l_noeth_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,GENS, UNIT >		_lnoeth_bind;
+	typedef Lmod<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT>						_lmod_bind;
+};
+
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename RSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct r_noeth_diag : public rmod_diag<M,BASE_RNG,BINARY,ANTI,RSCAL,UNIT >  {
+	typedef rmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >	_rmod_bind;
+		using _rmod_bind::RIGHT;
+		using _rmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
+		typedef GENS	_gen;
+		static const struct embed {
+			embed(const _gen& g, const M& m):_g(g),_m(m){}
+			embed(const embed& o):_g(o._g),_m(o._m){}
+			~embed(){}
+			M operator()(const _gen& g) const {
+				return g==_g?_m:_rmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT(_m);
+			}
+			M operator()(const BASE_RNG& r) const {return _rmod_bind::RIGHT(this->operator ()(_g),r);}
+			const _gen& operator()() const {return _g;}
+		private:
+			const _gen& _g;
+			const M&	_m;
+		};
+		typedef	std::map<_gen,embed>	_gen_map;
+};
+
+
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename RSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct r_noeth : public cat::cat<r_noeth_diag<M,BASE_RNG,ANTI,RSCAL,GENS, UNIT > > {
+	typedef r_noeth_diag<M,BASE_RNG,BINARY,ANTI,RSCAL,GENS,UNIT >		_rnoeth_bind;
+	typedef rmod<M,BASE_RNG,BINARY,ANTI,RSCAL,UNIT>						_rmod_bind;
+};
+
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename LSCAL,
+typename RSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct noeth_diag : public mod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,RSCAL,UNIT >  {
+	typedef l_noeth<M,BASE_RNG,BINARY,ANTI,LSCAL,GENS,UNIT >		_lnoeth_bind;
+	typedef r_noeth<M,BASE_RNG,BINARY,ANTI,RSCAL,GENS,UNIT >		_rnoeth_bind;
+
+};
+
+
+template<typename M,
+typename BASE_RNG,
+typename BINARY,
+typename ANTI,
+typename LSCAL,
+typename RSCAL,
+typename GENS,
+typename UNIT = unit<M >
+>
+struct noeth : public cat::cat<noeth_diag<M,BASE_RNG,ANTI,LSCAL,RSCAL,GENS, UNIT > > {
+	typedef noeth_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,RSCAL,GENS, UNIT >			_diag_bin;
+
+};
 } /*alg*/
 
 

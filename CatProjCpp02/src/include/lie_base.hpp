@@ -36,6 +36,18 @@ struct lie_diag : public alg_diag<g,BASE_RNG,MOD_BINARY, ANTI,LSCAL,RSCAL,LIE_BI
 
 
 };
+template<typename g,
+typename BASE_RNG,
+typename MOD_BINARY,
+typename ANTI,
+typename LSCAL,
+typename RSCAL,
+typename LIE_BINARY,
+typename UNIT = unit<g >
+>
+struct lie_alg {
+	typedef lie_diag<g,BASE_RNG,MOD_BINARY,ANTI,LSCAL,RSCAL,LIE_BINARY,UNIT > _lie_diag;
+};
 /**
  * @brief Commutator - wrapper structure template for commutators (Lie bracket '[,]')
  * @tparam T type

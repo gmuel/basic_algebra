@@ -84,7 +84,7 @@ public:
 			_ths operator()(const _ths& e1, const _ths& e2) const {
 				return _ths(
 							root_coeff(X,e1.h.coeff*(e2.x.coeff+e2.x.coeff)-(e1.x.coeff+e1.x.coeff)*e2.h.coeff),
-							root_coeff(Y,e1.h.coeff*(e2.y.coeff+e2.y.coeff)-(e1.y.coeff+e1.y.coeff)*e2.h.coeff),
+							root_coeff(Y,(e1.y.coeff+e1.y.coeff)*e2.h.coeff-e1.h.coeff*(e2.y.coeff+e2.y.coeff)),
 							root_coeff(H,e1.x.coeff*e2.y.coeff-e1.y.coeff*e2.x.coeff)
 							);
 			}

@@ -13,14 +13,25 @@
 
 
 namespace alg {
-
+/**
+ * @brief Special Lie algebra of size 2 - parameterized by ring type
+ *
+ * @tparam BASE_RNG ring type
+ */
 template<
 typename BASE_RNG
 >
 class sl2_el {
 public:
 	typedef sl2_el<BASE_RNG > _ths;
-	//typedef std::map<root_coeff,BA>
+
+	/**
+	 * @brief Root types
+	 *
+	 * Only three instances provided
+	 * <ol><li><tt>H</tt> semisimple instance</li>
+	 * <li><tt>X,Y</tt> nilpotent instances</li></ol>
+	 */
 	const static struct root {
 		~root(){}
 		friend class sl2_el;
@@ -31,10 +42,19 @@ public:
 		root(const root& o);
 		root& operator=(const root& o);
 
-	}& X, & Y, & H;
+	}
+	/**@brief upper nilpotent instance*/
+	& X,
+	/**@brief lower nilpotent instance*/
+	& Y,
+	/**@brief semisimple instance*/
+	& H;
+	/**
+	 * @brief Product type - uniting base ring and roots
+	 */
 	struct root_coeff {
 		root_coeff(const root& rt):r(rt),coeff(){}
-		root_coeff(const root& rt, const BASE_RNG coef):r(rt),coeff(coef){}
+		root_coeff(const root& rt, const BASE_RNG& coef):r(rt),coeff(coef){}
 		root_coeff(const root_coeff& o):r(o.r),coeff(o.coeff){}
 		~root_coeff(){}
 		root_coeff& operator=(const root_coeff& o) {
@@ -109,17 +129,42 @@ public:
 
 		}
 	};
+
 	friend struct sl2_el_unit {
 		template<typename U >
 				const _ths& operator()(const U& u) const {
 					return ZERO;
 				}
 			};
+	friend struct sl2_el_gens {
+		sl2_el_gens& operator++() {
+			if (rt!=&H){
+				if(rt==&Y) rt=&H;
+				else rt=&Y;
+			}
+			return *this;
+		}
+		sl2_el_gens operator++(int) {
+			sl2_el_gens cp(*this);
+			this->operator++();
+			return cp;
+		}
+		friend bool operator==(const sl2_el_gens& g1, const sl2_el_gens& g2) {
+			return g1.rt==g2.rt;
+		}
+		~sl2_el_gens(){rt=0;}
+	private:
+		sl2_el_gens():rt(&X){}
+		const root* rt;
+	};
 	sl2_el():x(X),y(Y),h(H){}
 	sl2_el(const root& rt, const BASE_RNG coeff):x(X),y(Y),h(H){rt==X?x.coeff = coeff:rt==Y?y.coeff=coeff:h.coeff = coeff;}
 	sl2_el(const root_coeff& xx, const root_coeff& yy, const root_coeff& hh):x(xx),y(yy),h(hh){}
 	static const sl2_el& ZERO;
 	typedef lie_alg<_ths,BASE_RNG, sl2_el_add ,sl2_el_anti , sl2_el_lscl , sl2_el_rscl , sl2_el_mul, sl2_el_unit > _lie_diag;
+	typedef l_noeth<_ths,BASE_RNG,sl2_el_add,sl2_el_anti,sl2_el_lscl,sl2_el_unit > _lie_lnoeth;
+	typedef r_noeth<_ths,BASE_RNG,sl2_el_add,sl2_el_anti,sl2_el_rscl,sl2_el_unit > _lie_rnoeth;
+
 private:
 	root_coeff x, y, h;
 };

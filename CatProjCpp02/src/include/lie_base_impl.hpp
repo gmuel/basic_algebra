@@ -136,10 +136,10 @@ public:
 
 	friend struct sl2_el_unit {
 		template<typename U >
-				const _ths& operator()(const U& u) const {
-					return ZERO;
-				}
-			};
+			const _ths& operator()(const U& u) const {
+				return ZERO;
+		}
+	};
 	friend struct sl2_el_gens {
 		sl2_el_gens& operator++() {
 			if (rt!=&H){
@@ -164,6 +164,7 @@ public:
 	sl2_el():x(X),y(Y),h(H){}
 	sl2_el(const root& rt, const BASE_RNG coeff):x(X),y(Y),h(H){rt==X?x.coeff = coeff:rt==Y?y.coeff=coeff:h.coeff = coeff;}
 	sl2_el(const root_coeff& xx, const root_coeff& yy, const root_coeff& hh):x(xx),y(yy),h(hh){}
+	sl2_el(const sl2_el& o):x(o.x),y(o.y),h(o.h){}
 	~sl2_el(){}
 	static const sl2_el& ZERO;
 	/**@brief Lie algebra diagram h´short hand*/
@@ -173,6 +174,8 @@ public:
 private:
 	root_coeff x, y, h;
 };
+
+
 
 
 

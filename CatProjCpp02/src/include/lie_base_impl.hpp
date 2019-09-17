@@ -113,6 +113,7 @@ public:
 							);
 			}
 		};
+	/**@brief Left scalar action struct*/
 	friend struct sl2_el_lscl {
 		_ths operator()(const BASE_RNG& scl, const _ths& e) const {
 			return _ths(
@@ -123,6 +124,7 @@ public:
 
 		}
 	};
+	/**@brief Right scalar action struct*/
 	friend struct sl2_el_rscl {
 		_ths operator()(const _ths& e, const BASE_RNG& scl) const {
 			return _ths(
@@ -133,18 +135,20 @@ public:
 
 		}
 	};
-
+	/**@brief Specialized unit map*/
 	friend struct sl2_el_unit {
 		template<typename U >
 			const _ths& operator()(const U& u) const {
 				return ZERO;
 		}
 	};
+	/**@brief Generator struct*/
 	friend struct sl2_el_gens {
 		sl2_el_gens& operator++() {
-			if (rt!=&H){
-				if(rt==&Y) rt=&H;
-				else rt=&Y;
+			switch(rt){
+			case &X: rt=&Y;break;
+			case &Y: rt=&H;break;
+			case &H: rt=&H;break;
 			}
 			return *this;
 		}
@@ -156,13 +160,26 @@ public:
 		friend bool operator==(const sl2_el_gens& g1, const sl2_el_gens& g2) {
 			return g1.rt==g2.rt;
 		}
+		/**@brief Pointer operator - returns root pointer, possibly null*/
+		const root* operator->()const {return rt;}
 		~sl2_el_gens(){rt=0;}
+		sl2_el_gens(const sl2_el_gens& o):rt(o.rt){}
+		sl2_el_gens& operator=(const sl2_el_gens& o){
+			rt=o.rt;
+			return *this;
+		}
+		static const sl2_el_gens& end(){
+			static sl2_el_gens end;
+			if(end.rt!=0) end.rt=0;
+			return end;
+		}
 	private:
 		sl2_el_gens():rt(&X){}
 		const root* rt;
+		friend class sl2_el;
 	};
 	sl2_el():x(X),y(Y),h(H){}
-	sl2_el(const root& rt, const BASE_RNG coeff):x(X),y(Y),h(H){rt==X?x.coeff = coeff:rt==Y?y.coeff=coeff:h.coeff = coeff;}
+	sl2_el(const root& rt, const BASE_RNG&	coeff):x(X),y(Y),h(H){rt==X?x.coeff = coeff:rt==Y?y.coeff=coeff:h.coeff = coeff;}
 	sl2_el(const root_coeff& xx, const root_coeff& yy, const root_coeff& hh):x(xx),y(yy),h(hh){}
 	sl2_el(const sl2_el& o):x(o.x),y(o.y),h(o.h){}
 	~sl2_el(){}
@@ -170,7 +187,7 @@ public:
 	/**@brief Lie algebra diagram h´short hand*/
 	typedef lie_alg<_ths,BASE_RNG, sl2_el_add ,sl2_el_anti , sl2_el_lscl , sl2_el_rscl , sl2_el_mul, sl2_el_unit > _lie_diag;
 	/**@brief Noetherian module diagram short hand*/
-	typedef noeth<_ths,BASE_RNG,sl2_el_add,sl2_el_anti,sl2_el_lscl,sl2_el_rscl,const root&,sl2_el_unit > _lie_noeth;
+	typedef noeth<_ths,BASE_RNG,sl2_el_add,sl2_el_anti,sl2_el_lscl,sl2_el_rscl,sl2_el_gens,sl2_el_unit > _lie_noeth;
 private:
 	root_coeff x, y, h;
 };

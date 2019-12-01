@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_GROUP_GROUP_N_DIHEDRAL_HPP_
 
 
-#include "group_base_impl.hpp"
+#include "group_group_base_impl.hpp"
 
 namespace alg {
 template<unsigned int N >

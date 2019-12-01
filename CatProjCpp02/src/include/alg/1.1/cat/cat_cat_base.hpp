@@ -9,7 +9,9 @@
 #define INCLUDE_ALG_1_1_CAT_CAT_CAT_BASE_HPP_
 
 
-#include "paired_type.hpp"
+#include "../utils/utils_paired_type.hpp"
+#ifndef H_CAT_BASE_HPP_USING_STD
+#include "../utils/utils_paired_type.hpp"
 #else
 #include <utility>
 #endif

@@ -10,8 +10,8 @@
 
 
 
-#include "group_base.hpp"
-#include "cyclics.hpp"
+#include "group_group_base.hpp"
+#include "group_cyclics.hpp"
 //test implementation
 namespace alg {
 

@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_GROUP_GROUP_GROUP_BASE_HPP_
 
 
-#include "cat_base.hpp"
+#include "../cat/cat_cat_base.hpp"
 namespace alg {
 
 //using namespace cat;
@@ -107,8 +107,8 @@ const assoc<T,U >& semi_group<T,U >::ASS_DIAGRAM = assoc<T,U>(semi_group<T,U>::O
 template<typename MONOID , typename BINARY , typename _UNIT = unit<MONOID> >
 struct unital_associative : public assoc<MONOID, BINARY > {
 	typedef assoc<MONOID,BINARY > _base;
-	typedef UNIT	_unit;
-	static const _UNIT& UNIT;
+	typedef _UNIT	_unit;
+	static const _unit& UNIT;
 
 	unital_associative(const BINARY& bin):_base(bin){}
 

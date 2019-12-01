@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_RING_RING_CYCLICS_FUN_HPP_
 
 
-#include "cyclics.hpp"
+#include "../group/group_cyclics.hpp"
 namespace alg {
 /**
  * @brief Cyclic number project structure template

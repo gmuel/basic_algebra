@@ -28,7 +28,7 @@ struct cyclic {
 	 *
 	 * Acts as a fixed size array of const
 	 * cyclics. The implemented subscript
-	 * operator computes 'i mod CYC_TYPE' (non-negative!)
+	 * operator computes 'i mod CYC_TYPE' (non-negatively represented)
 	 * Thus, any subscript call is range-valid
 	 */
 	struct cyc_ar {

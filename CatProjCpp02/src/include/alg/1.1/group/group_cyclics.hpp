@@ -28,7 +28,7 @@ struct cyclic {
 	 *
 	 * Acts as a fixed size array of const
 	 * cyclics. The implemented subscript
-	 * operator computes 'i mod CYC_TYPE' (non-neg)
+	 * operator computes 'i mod CYC_TYPE' (non-negative!)
 	 * Thus, any subscript call is range-valid
 	 */
 	struct cyc_ar {
@@ -81,7 +81,7 @@ struct cyclic {
 	static unsigned int value(const _cyc_& c){
 		return (c.abs() - VALS.VALS->abs())/SIZE;
 	}
-	static const _c_ref def_val(){return VALS[0];}
+	static _c_ref def_val(){return VALS[0];}
 
 	//add
 	friend _c_ref operator+(_c_ref c1, _c_ref c2){return VALS[(c1.abs()+c2.abs())/SIZE];}

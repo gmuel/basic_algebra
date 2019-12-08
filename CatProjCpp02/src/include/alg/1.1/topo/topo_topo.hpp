@@ -17,8 +17,15 @@ using namespace cat;
 template<typename X,
 typename T>
 struct interior {
-	typedef interior<X,interior<X,T> > _inner_int;
+	typedef interior<X,interior<X,T > > _inner_int;
 };
+template<typename X,
+typename T >
+struct hull{
+	typedef hull<X,hull<X,T > > _outer_hull;
+};
+
+
 
 
 

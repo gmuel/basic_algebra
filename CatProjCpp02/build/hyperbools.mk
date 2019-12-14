@@ -14,6 +14,7 @@ all : $(TAR)
 
 $(TAR) : $(OBJ)
 	$(CC) -shared -fPIC $< -o $@
-
+	rm $(TAR).*
 $(OBJ) : $(LIB)/hyperbools.cpp $(INC)/hyperbools.hpp
 	$(CC) -fPIC -c $< -o $@
+

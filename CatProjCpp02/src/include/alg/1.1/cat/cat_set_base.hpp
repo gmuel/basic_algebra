@@ -8,7 +8,7 @@
 #ifndef INCLUDE_ALG_1_1_CAT_CAT_SET_BASE_HPP_
 #define INCLUDE_ALG_1_1_CAT_CAT_SET_BASE_HPP_
 
-#include "cat_base.hpp"
+#include "cat_cat_base.hpp"
 
 namespace cat {
 

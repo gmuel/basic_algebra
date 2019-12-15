@@ -1,7 +1,6 @@
 #!/usr/bin/make -f
 
 #change permissions to 7** to use mk-file as script
-HME=${HOME}/git/basic_algebra/CatProjCpp02
 SRC=${HME}/src
 INC=$(SRC)/include
 LIB=$(SRC)/lib
@@ -16,11 +15,11 @@ TAR3=$(TAR2).$(sub)
 all : $(TAR)
 .PHONY : clean
 $(TAR) : $(TAR1)
-	[ -f $@ ] && rm $@; ln -s $< $@
+	[ -f $@ ] || ln -s $< $@
 $(TAR1) : $(TAR2)
-	[ -f $@ ] && rm $@; ln -s $< $@
+	[ -f $@ ] || ln -s $< $@
 $(TAR2) : $(TAR3)
-	[ -f $@ ] && rm $@; ln -s $< $@
+	[ -f $@ ] || ln -s $< $@
 $(TAR3) : $(OBJ)
 	$(CC) -shared -fPIC $< -o $@
 $(OBJ) : $(LIB)/hyperbools.cpp $(INC)/hyperbools.hpp

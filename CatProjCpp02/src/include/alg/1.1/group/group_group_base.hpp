@@ -107,6 +107,7 @@ const assoc<T,U >& semi_group<T,U >::ASS_DIAGRAM = assoc<T,U>(semi_group<T,U>::O
 template<typename MONOID , typename BINARY , typename _UNIT = unit<MONOID> >
 struct unital_associative : public assoc<MONOID, BINARY > {
 	typedef assoc<MONOID,BINARY > _base;
+	typedef semi_group<MONOID,BINARY > _semi_bind;
 	typedef _UNIT	_unit;
 	static const _unit& UNIT;
 

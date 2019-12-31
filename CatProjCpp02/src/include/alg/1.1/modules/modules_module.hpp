@@ -8,10 +8,7 @@
 #ifndef INCLUDE_ALG_1_1_MODULES_MODULES_MODULE_HPP_
 #define INCLUDE_ALG_1_1_MODULES_MODULES_MODULE_HPP_
 
-
-#ifndef INCLUDE_MODULE_HPP_
-#define INCLUDE_MODULE_HPP_
-#include "ring_base.hpp"
+#include "../ring/ring_ring_base.hpp"
 #include <map>
 namespace alg {
 /**

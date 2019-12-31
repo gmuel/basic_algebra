@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_RING_RING_RING_BASE_HPP_
 
 
-#include "group_base.hpp"
+#include "../group/group_group_base.hpp"
 
 
 namespace alg {

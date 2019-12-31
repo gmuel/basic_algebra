@@ -10,7 +10,7 @@
 
 
 #include "ring_ring_base.hpp"
-#include "group_base_impl.hpp"
+#include "../group/group_group_base_impl.hpp"
 
 
 namespace alg {

@@ -55,6 +55,39 @@ struct uring : public cat::cat<uring_diag<RNG, ABL_BINARY, ABL_ANTI, MND_BINARY,
 	typedef ring_diag<RNG, ABL_BINARY, ABL_ANTI, ABL_UNIT > 						_rng_bind;
 };
 
+
+struct zero {
+	static const zero& ZERO;
+	struct add {zero operator()(const zero& z1, const zero& z2) const {return ZERO;}};
+	struct mul {zero operator()(const zero& z1, const zero& z2) const {return ZERO;}};
+	struct eq {bool operator()(const zero& z1, const zero& z2) const {return true;}};
+	struct unit {
+		template<typename U >
+		zero operator()(const U& u) const {return ZERO;}
+	};
+	struct anti {
+
+			zero operator()(const zero& z) const {return ZERO;}
+		};
+	typedef ring<zero,add,anti,mul,unit >		_rng_bind;
+	typedef uring<zero,add,anti,mul,unit,unit >	_urng_bind;
+};
+
+template<
+typename RNG,
+typename ABL_BINARY,
+typename ABL_ANTI,
+typename SMG_BINARY,
+typename ABL_UNIT = unit<RNG >
+>
+struct terminal_map {
+	typedef ring<RNG,ABL_BINARY,ABL_ANTI,ABL_UNIT > _rng_bind;
+	typedef cat::morph<_rng_bind,zero::_rng_bind,terminal_map<RNG,ABL_BINARY,ABL_ANTI,ABL_UNIT >  >
+												_mor_bind;
+};
+
+
+
 } /*alg*/
 
 

@@ -47,6 +47,63 @@ private:
 	cyc_unit(const cyc_unit<N >& o);
 };
 
+template<unsigned int N >
+struct cyclics {
+	typedef uring<cyclic_wrp<N >, cyclic_add<N >,cyclic_add_anti<N >,cyc_rng_mul<N >,cyc_unit<N > > _urng_bind;
+};
+
+
+template<
+typename URNG,
+typename ABL_BIN,
+typename ABL_ANT,
+typename MND_BIN,
+typename MND_UNI,
+typename ABL_UNI = unit<URNG >
+>
+struct initial {
+	typedef initial<
+			URNG,
+			ABL_BIN,
+			ABL_ANT,
+			MND_BIN,
+			MND_UNI,
+			ABL_UNI>
+						_ths;
+	typedef cyclic_wrp<0 > _urng_obj;
+
+	typedef cyclic_add<0 > _urng_bin;
+	typedef cyclic_add_anti<0 > _urng_aant;
+	typedef cyclic_add_unit<0 > _urng_auni;
+	typedef cyc_rng_mul<0 > _urng_mbin;
+	typedef cyc_unit<0 > _urng_muni;
+	typedef cyclics<0 > _urng_bind1;
+	typedef uring<URNG,ABL_BIN,ABL_ANT,MND_BIN,MND_UNI,ABL_UNI > _urng_bind2;
+	typedef cat::morph<
+			_urng_obj,
+			_urng_bind2,
+			_ths
+			>			_mor_bind;
+};
+template< unsigned int M, unsigned int N , bool B = (M%N == 0)>
+struct cinitial /*<
+N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M >
+>*/
+{
+	typedef initial<N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,
+				cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M > >
+						_ths;
+	typedef cyclics<N > _pre_image;
+	typedef uring< cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,
+			cyc_rng_mul<M >,cyc_unit<M > > _urng_bind;
+	typedef cat::morph<
+			_pre_image,
+			_urng_bind,
+			_ths
+			>			_mor_bind;
+};
+
+
 } /*alg*/
 
 

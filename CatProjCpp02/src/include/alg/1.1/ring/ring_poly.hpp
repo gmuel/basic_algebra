@@ -13,17 +13,28 @@
 #include <utility>
 namespace alg {
 template<typename RNG , typename MON>
-class poly_struct {
+class poly {
 	typedef typename MON::_mon_bind _mon_bind;
-	typedef poly_struct<MON,RNG > 			_ths;
+	typedef typename RNG::_rng_bind _rng_bing;
+	typedef poly<MON,RNG > 			_ths;
 	typedef std::map<MON,RNG> 				_map;
 	typedef typename _map::iterator 		_iter;
 	typedef typename _map::const_iterator 	_citer;
 	_map coeffs;
 public:
+	poly(const MON& i, const RNG& scl = RNG::UNIT()) : coeffs(){
+		if(scl!=0) {
+			coeffs[i]=scl;
+		}
 
+	}
+	poly(const _ths& o):coeffs(o.coeffs){}
+	poly& operator=(const _ths& o) {
+		coeffs = o.coeffs;
+		return *this;
+	}
 	friend struct poly_add {
-		poly_struct operator()(const _ths& p1, const _ths& p2) const {
+		poly operator()(const _ths& p1, const _ths& p2) const {
 			int sz1=p1.coeffs.size(), sz2 = p2.coeffs.size();
 			const _ths& smd = sz1>sz2?p2:p1;
 			_ths sum(sz1>sz2?p1:p2);
@@ -50,7 +61,7 @@ public:
 		_ths operator()(const _ths& p) const {
 			_ths inv;
 			for (_citer i = p.coeffs.cbegin();i!=p.coeffs.cend();++i){
-				inv[i->first]=-i->second;
+				inv[i->first]=-(i->second);
 			}
 			return inv;
 		}
@@ -83,6 +94,20 @@ public:
 
 		}
 	};
+	friend struct poly_eq {
+		bool operator()(const _ths& p1, const _ths& p2) const {
+			_citer i1 = p1.coeffs.cbegin(), e1 = p1.coeffs.cend(),
+					i2 = p2.coeffs.cbegin(), e2 = p2.coeffs.cend();
+			while (i1!=e1&&i2!=e2){
+				if (i1->first != i2->first) return false;
+				if (i1->second !=i2->second) return false;
+				++i1;++i2;
+			}
+
+			return i1==e1&&i2==e2?true:false;
+		}
+	};
+
 };
 
 }

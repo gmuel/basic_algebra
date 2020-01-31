@@ -90,7 +90,7 @@ struct cinitial /*<
 N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M >
 >*/
 {
-	typedef initial<N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,
+	typedef cinitial<N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,
 				cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M > >
 						_ths;
 	typedef cyclics<N > _pre_image;

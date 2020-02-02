@@ -71,7 +71,7 @@ public:
 			_ths prod;
 			int sz1 = p1.coeffs.size(), sz2=p2.coeffs.size();
 			const _ths& inner = sz1>sz2?p2:p1,& outer = sz1>sz2?p1:p2;
-			_citer i1 = outer.coeffs.cbegin(), e1= outer.coeffs.cend(),
+			_citer i1 = outer.coeffs.cbegin(), e1= outer.coeffsgit .cend(),
 					i2=inner.coeffs.cbegin(), e2 =inner.coeffs.cend();
 			for(;i1!=e1;++i1){
 				const MON&  mn1 = i1->first;

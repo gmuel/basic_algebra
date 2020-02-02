@@ -274,8 +274,8 @@ public:
 	 * Constructs diagonal matrix $\fscl\cdot I_{\math{szz}}$\f
 	 */
 	matrix(const RNG& scl, unsigned int szz):
-		mat(szz,szz+1),
-		sz(szz),
+		mat(szz+1,szz+1),
+		sz(szz*szz+2*szz+1),
 		detPtr(0){
 
 	}

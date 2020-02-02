@@ -28,21 +28,19 @@ public:
 		friend class mat_add;
 		friend class mat_mul;
 		matArray getColumn(unsigned int i) const {
-			matArray cols;
-			for (unsigned int j=0;j<row;++j){
-				cols.coeffs[col*j] = coeffs[col*j+i];
+			matArray cols(row,1);
+			for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
+				unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
+				if(cl==i) cols.coeffs[rw*col] = ii->second;
 			}
-			cols.col=1;
-			cols.row=row;
 			return cols;
 		}
 		matArray getRow(unsigned int i) const {
-			matArray rows;
-			for (unsigned int j=0;j<row;++j){
-				rows.coeffs[j] = coeffs[col*i+j];
+			matArray rows(1,col);
+			for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
+				unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
+				if(rw==i) rows.coeffs[cl] = ii->second;
 			}
-			rows.col=col;
-			rows.row=1;
 			return rows;
 		}
 		_citer operator[](unsigned int i) const {
@@ -154,12 +152,12 @@ public:
 		unsigned int row, col;
 		void setCoeff(unsigned int rowId, unsigned int colId, const RNG& scl){
 			if(rowId<row&&colId<col){
-				_citer ii = coeffs.find(rowId*col+colId);
+				_iter ii = coeffs.find(rowId*col+colId);
 				if(scl!=0){
-					if(ii!=coeffs.cend()) ii->second = scl;
+					if(ii!=coeffs.end()) ii->second = scl;
 					else coeffs[rowId*col+colId] = scl;
 				}
-				else if(ii!=coeffs.cend()){
+				else if(ii!=coeffs.end()){
 					coeffs.erase(ii);
 				}
 			}
@@ -275,17 +273,17 @@ public:
 	 */
 	matrix(const RNG& scl, unsigned int szz):
 		mat(szz+1,szz+1),
-		sz(szz*szz+2*szz+1),
+		sz(szz),
 		detPtr(0){
 
 	}
 	matrix(unsigned int i, unsigned int j, const RNG& scl):
 		mat(i>j?i+1:j+1,i>j?j+1:i+1),
-		sz(),
+		sz(mat.col),
 		detPtr(0){
 
 	}
-	matrix(const matArray& mArr):matArray(mArr),sz(mArr.col*mArr.row),detPtr(0){}
+	matrix(const matArray& mArr):matArray(mArr),sz(mArr.col),detPtr(0){}
 	matrix(const matrix<RNG >& o):
 		matArray(o.matArray),
 		sz(o.sz),
@@ -293,10 +291,39 @@ public:
 	~matrix(){
 		if(detPtr!=0){delete detPtr; detPtr = 0;}
 	}
-	void addRowMultiple(unsigned int row, const RNG& scl) {
+	void addLeftRowMultiple(unsigned int row, const RNG& scl) {
 		const matArray& rowMat = mat.getRow(row);
-		matrix<RNG > imm;
-		imm.
+		for (_citer i = rowMat.coeffs.cbegin(); i!=rowMat.coeffs.cend();++i){
+			unsigned int j1 = i->first%rowMat.col;
+			_iter ii = mat.coeffs.find(row*mat.row+j1);
+			const RNG& scl0 = scl*i->second;
+			if(ii==mat.coeffs.cend()){
+				if(scl0!=0) mat.coeffs[row*mat.row+j1]=scl0;
+			}
+			else{
+				const RNG& sum = ii->second + scl0;
+				if(sum==0) mat.coeffs.erase(ii);
+				else ii->second = sum;
+			}
+		}
+
+	}
+	void addRightRowMultiple(unsigned int row, const RNG& scl) {
+		const matArray& rowMat = mat.getRow(row);
+		for (_citer i = rowMat.coeffs.cbegin(); i!=rowMat.coeffs.cend();++i){
+			unsigned int j1 = i->first%rowMat.col;
+			_iter ii = mat.coeffs.find(row*mat.row+j1);
+			const RNG& scl0 = i->second*scl;
+			if(ii==mat.coeffs.cend()){
+				if(scl0!=0) mat.coeffs[row*mat.row+j1]=scl0;
+			}
+			else{
+				const RNG& sum = ii->second + scl0;
+				if(sum==0) mat.coeffs.erase(ii);
+				else ii->second = sum;
+			}
+		}
+
 	}
 	const RNG& det() const {
 		if(detPtr==0) setDet();
@@ -321,6 +348,23 @@ private:
 
 	unsigned int sz;
 	void setDet() const{
+		if(sz==1) {
+			_iter i = mat.coeffs.find(0);
+			detPtr  = i!=mat.coeffs.end()?new RNG(i->second):
+					new RNG;
+			return;
+		}
+		if(sz==2) {
+			_citer i00 = mat.coeffs.find(0), i01 = mat.coeffs.find(0),
+					i10 = mat.coeffs.find(2), i11 = mat.coeffs.find(3),
+					e = mat.coeffs.cend();
+			RNG val;
+			if(i00!=e && i11!=e) val = i00->second * i11->second;
+
+			if(i01!=e&&i10 ) val -=i01->second * i10 -> second;
+			detPtr = new RNG(val);
+			return;
+		}
 		unsigned int row = mat.rowMinSupport();
 
 		matArray sub = mat.getRow(row);

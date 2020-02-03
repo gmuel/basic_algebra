@@ -285,7 +285,7 @@ public:
 	}
 	matrix(const matArray& mArr):matArray(mArr),sz(mArr.col),detPtr(0){}
 	matrix(const matrix<RNG >& o):
-		matArray(o.matArray),
+		matArray(o.mat),
 		sz(o.sz),
 		detPtr(o.detPtr==0?0:new RNG(*o.detPtr)){}
 	~matrix(){

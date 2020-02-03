@@ -185,7 +185,7 @@ struct l_noeth_diag : public lmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >  {
 
 	typedef lmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >	_lmod_bind;
 	using _lmod_bind::LEFT;
-	using _lmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
+	//using _lmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
 	typedef GENS	_gen;
 	struct embed {
 		embed(const _gen& g, const M& m):_g(g),_m(m){}
@@ -194,7 +194,7 @@ struct l_noeth_diag : public lmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >  {
 		M operator()(const _gen& g) const {
 			return g==_g?_m:_lmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT(_m);
 		}
-		M operator()(const BASE_RNG& r) const {return _lmod_bin::LEFT(r,this->operator()(_g));}
+		M operator()(const BASE_RNG& r) const {return _lmod_bind::LEFT(r,this->operator()(_g));}
 		const _gen& operator()() const {return _g;}
 	private:
 		const _gen& _g;
@@ -216,7 +216,7 @@ typename UNIT = unit<M >
 >
 struct l_noeth : public cat::cat<l_noeth_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,GENS, UNIT > > {
 	typedef l_noeth_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,GENS, UNIT >		_lnoeth_bind;
-	typedef Lmod<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT>						_lmod_bind;
+	typedef lmod<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT>						_lmod_bind;
 };
 
 template<typename M,
@@ -228,11 +228,11 @@ typename GENS,
 typename UNIT = unit<M >
 >
 struct r_noeth_diag : public rmod_diag<M,BASE_RNG,BINARY,ANTI,RSCAL,UNIT >  {
-	typedef rmod_diag<M,BASE_RNG,BINARY,ANTI,LSCAL,UNIT >	_rmod_bind;
+	typedef rmod_diag<M,BASE_RNG,BINARY,ANTI,RSCAL,UNIT >	_rmod_bind;
 		using _rmod_bind::RIGHT;
-		using _rmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
+		//using _rmod_bind::_abl_bind::_grp_bind::_u_assc::UNIT;
 		typedef GENS	_gen;
-		static const struct embed {
+		struct embed {
 			embed(const _gen& g, const M& m):_g(g),_m(m){}
 			embed(const embed& o):_g(o._g),_m(o._m){}
 			~embed(){}

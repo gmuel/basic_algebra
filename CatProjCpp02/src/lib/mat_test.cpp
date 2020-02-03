@@ -11,7 +11,7 @@
 #include <iostream>
 using namespace alg;
 using namespace std;
-typedef cyclic_wrp<2 > c2;
+typedef cyc_rng_obj<2 > c2;
 static c2 ONE(1);
 int main () {
 	matrix<c2 > e0(0,0,ONE), e1 (0,1,ONE),

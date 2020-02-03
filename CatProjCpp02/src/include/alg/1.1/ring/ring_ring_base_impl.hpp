@@ -23,13 +23,13 @@ struct cyc_rng_obj : public cyclic_wrp<N > {
 	cyc_rng_obj(int i = 0):_base(0){}
 	cyc_rng_obj(const _base& o):_base(o){}
 	cyc_rng_obj& operator=(int i){_base::operator=(i);return *this;}
-	cyc_rng_obj& operator=(explicit const _base& o){_base::operator=(o);return *this;}
+	cyc_rng_obj& operator=(const _base& o){_base::operator=(o);return *this;}
 };
 
 template<unsigned int N >
-struct cyc_rng_mul : public binary< cyclic_wrp<N >, cyc_rng_mul<N > > {
-	cyclic_wrp<N > operator()(const cyclic_wrp<N >& c1, const cyclic_wrp<N >& c2) const {
-		return cyclic_wrp<N >((*c1)*(*c2));
+struct cyc_rng_mul : public binary< cyc_rng_obj<N >, cyc_rng_mul<N > > {
+	cyclic_wrp<N > operator()(const cyc_rng_obj<N >& c1, const cyc_rng_obj<N >& c2) const {
+		return cyc_rng_obj<N >((*c1)*(*c2));
 	}
 };
 /*
@@ -37,10 +37,10 @@ template<unsigned int N >
 const cyc_rng_mul<N >& binary<cyclic_wrp<N >, cyc_rng_mul<N > >::OPERATION = cyc_rng_mul<N >();
 */
 template<unsigned int N >
-struct cyc_unit : public unit<cyclic_wrp<N > > {
+struct cyc_unit : public unit<cyc_rng_obj<N > > {
 	typedef unit<cyclic_wrp<N > > _base;
 	template<typename U >
-	const cyclic_wrp<N >& operator()(const U& u) const {static cyclic_wrp<N > one(1);return one;}
+	const cyc_rng_obj<N >& operator()(const U& u) const {static cyc_rng_obj<N > one(1);return one;}
 	friend struct unit<cyclic<N > >;
 private:
 	cyc_unit():_base(){}
@@ -90,8 +90,7 @@ struct cinitial /*<
 N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M >
 >*/
 {
-	typedef cinitial<N, cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,
-				cyc_rng_mul<M >,cyc_unit<M >, cyclic_add_unit<M > >
+	typedef cinitial<M, N, B >
 						_ths;
 	typedef cyclics<N > _pre_image;
 	typedef uring< cyclic_wrp<M >, cyclic_add<M >,cyclic_add_anti<M >,

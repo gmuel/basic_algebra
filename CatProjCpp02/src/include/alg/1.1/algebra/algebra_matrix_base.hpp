@@ -12,6 +12,205 @@
 
 namespace alg {
 
+template<typename RNG >
+class matrix;
+template<typename RNG >
+struct mat_add;
+template<typename RNG >
+struct mat_mul;
+/**
+ * @brief Matrix array class template
+ *
+ *
+ */
+template<typename RNG >
+struct matArray {
+	typedef std::map<unsigned int,RNG > _map;
+	typedef typename _map::const_iterator _citer;
+	typedef typename _map::iterator _iter;
+	template<typename MAT_TYPE, typename ITER_TYPE >
+	friend struct rowIter : public ITER_TYPE {
+		friend struct matArray<RNG >;
+		rowIter& operator++(){
+			while(*(this)!=endIt && (this->operator->()->first)/ptr->col!=rowIdx)
+				ITER_TYPE::operator ++();
+			ITER_TYPE::operator ++();
+			return *this;
+		}
+		rowIter operator++(int) {
+			rowIter cp (*this);
+			this->operator ++();
+			return cp;
+		}
+		rowIter(const rowIter& o):ptr(o.ptr),endIt(o.endIt),rowIdx(o.rowIdx){}
+		~rowIter(){ptr=0;}
+		rowIter& operator=(const rowIter& o){
+			ptr = o.ptr;
+			endIt = o.endIt;
+			rowIdx = o.rowIdx;
+			return *this;
+		}
+	private:
+		rowIter(matArray& mat, unsigned int rowId):ptr(&mat),endIt(mat.coeffs.end()),rowIdx(rowId){}
+
+		MAT_TYPE* ptr;
+		ITER_TYPE endIt;
+		unsigned int rowIdx;
+
+	};
+	friend class matrix<RNG >;
+	friend class mat_add;
+	friend class mat_mul;
+	matArray getColumn(unsigned int i) const {
+		matArray cols(row,1);
+		for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
+			unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
+			if(cl==i) cols.coeffs[rw*col] = ii->second;
+		}
+		return cols;
+	}
+	matArray getRow(unsigned int i) const {
+		matArray rows(1,col);
+		for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
+			unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
+			if(rw==i) rows.coeffs[cl] = ii->second;
+		}
+		return rows;
+	}
+	_citer operator[](unsigned int i) const {
+		return coeffs.find(i);
+	}
+	_iter operator[](unsigned int i){
+		return coeffs.find(i);
+	}
+	matArray& operator=(const matArray&  o){
+		coeffs = o.coeffs;
+		col = o.col;
+		row = o.row;
+	}
+	unsigned int colMinSupport() const {
+		unsigned int supp(0),cnt(0),last(-1),row0;
+		for(unsigned int i = 0; i<col;++i){
+			cnt=0;
+			for(unsigned int j =0; j<row;++j){
+				_citer ii = coeffs.find(j*col+i);
+				if(ii!=coeffs.cend()&&ii->second!=0){
+					++cnt;
+				}
+
+			}
+			if(cnt==0) return i;
+			if(cnt<last) {last=cnt;supp=i;}
+		}
+		return supp;
+	}
+	unsigned int rowMinSupport() const {
+		unsigned int supp(0),cnt(0),last(-1),row0;
+		for(_citer i = coeffs.cbegin(); i!=coeffs.cend();++i){
+			unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
+
+			if(i->second==0) {
+				if (cnt==0&&col_val==col-1) return row_val;
+
+				continue;
+			}
+
+			if(row_val-row0>1) return row0+1;
+			if(last<cnt) continue;
+			if(row_val-row0!=1) {
+				++cnt;
+				if(col_val==col-1 && cnt<last){
+					last=cnt;
+					supp=row_val;
+				}
+			}
+			else {
+				if(cnt<last) {last=cnt+1;supp=row_val;}
+				cnt=1;
+				row0=row_val;
+			}
+		}
+
+		return supp;
+	}
+	matArray submat(unsigned int i0, unsigned int i1, unsigned int j0, unsigned int j1) const {
+		matArray sub;
+		sub.col=j1-j0;
+		sub.row=i1-i0;
+		for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
+			unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
+			if(row_val>=i0&&i1>row_val) {
+				if(col_val>=j0&&j1>col_val) sub.setCoeff(row_val-i0,col_val-j0,i->second);
+			}
+		}
+		return sub;
+	}
+	matArray submat(unsigned int i, unsigned int j) const {
+		matArray sub;
+		sub.col=col-1;
+		sub.row=row-1;
+		for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
+			unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
+			if(row_val<i) {
+				if(col_val<j) sub.setCoeff(row_val,col_val,i->second);
+				else if(col_val>j){
+					sub.setCoeff(row_val,col_val-1,i->second);
+				}
+			}
+			else if(row_val>i){
+				if(col_val<j) sub.setCoeff(row_val-1,col_val,i->second);
+				else if(col_val>j){
+					sub.setCoeff(row_val-1,col_val-1,i->second);
+				}
+			}
+		}
+		return sub;
+	}
+	matArray transpose() const {
+		matArray trans;
+		trans.col=row;
+		trans.row=col;
+		for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
+			unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
+			trans.setCoeff(col_val,row_val,i->second);
+		}
+		return trans;
+	}
+	matArray(const matArray& o):
+		coeffs(o.coeffs),
+		col(o.col),
+		row(o.row){}
+
+	private:
+	_map coeffs;
+	unsigned int row, col;
+	void setCoeff(unsigned int rowId, unsigned int colId, const RNG& scl){
+		if(rowId<row&&colId<col){
+			_iter ii = coeffs.find(rowId*col+colId);
+			if(scl!=0){
+				if(ii!=coeffs.end()) ii->second = scl;
+				else coeffs[rowId*col+colId] = scl;
+			}
+			else if(ii!=coeffs.end()){
+				coeffs.erase(ii);
+			}
+		}
+	}
+	void setCoeff(unsigned int rowId, unsigned int colId, const matArray& m){
+
+		if(col>=m.col+colId && row>=m.row+rowId){
+			for (_citer i = m.coeffs.cbegin(); i!= m.coeffs.cend();++i){
+				unsigned int col0 = i->first/m.col, row0 = (i->first - col0)/m.col;
+				setCoeff(rowId+row0,colId+col0,i->second);
+			}
+		}
+	}
+	matArray(unsigned int rw, unsigned int cl):
+		coeffs(),
+		col(cl),
+		row(rw){}
+};
+
 template<
 typename RNG
 >
@@ -20,162 +219,11 @@ class matrix {//:public ...
 
 public:
 	typedef std::map<unsigned int,RNG > _map;
+	typedef matArray<RNG >	matArray;
 	typedef typename _map::const_iterator _citer;
 	typedef typename _map::iterator _iter;
 
-	struct matArray {
-		friend class matrix<RNG >;
-		friend class mat_add;
-		friend class mat_mul;
-		matArray getColumn(unsigned int i) const {
-			matArray cols(row,1);
-			for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
-				unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
-				if(cl==i) cols.coeffs[rw*col] = ii->second;
-			}
-			return cols;
-		}
-		matArray getRow(unsigned int i) const {
-			matArray rows(1,col);
-			for (_citer ii = coeffs.cbegin(); ii != coeffs.cend(); ++ii){
-				unsigned cl = ii->first%col, rw = (ii->first - cl)/col;
-				if(rw==i) rows.coeffs[cl] = ii->second;
-			}
-			return rows;
-		}
-		_citer operator[](unsigned int i) const {
-			return coeffs.find(i);
-		}
-		_iter operator[](unsigned int i){
-			return coeffs.find(i);
-		}
-		matArray& operator=(const matArray&  o){
-			coeffs = o.coeffs;
-			col = o.col;
-			row = o.row;
-		}
-		unsigned int colMinSupport() const {
-			unsigned int supp(0),cnt(0),last(-1),row0;
-			for(unsigned int i = 0; i<col;++i){
-				cnt=0;
-				for(unsigned int j =0; j<row;++j){
-					_citer ii = coeffs.find(j*col+i);
-					if(ii!=coeffs.cend()&&ii->second!=0){
-						++cnt;
-					}
 
-				}
-				if(cnt==0) return i;
-				if(cnt<last) {last=cnt;supp=i;}
-			}
-			return supp;
-		}
-		unsigned int rowMinSupport() const {
-			unsigned int supp(0),cnt(0),last(-1),row0;
-			for(_citer i = coeffs.cbegin(); i!=coeffs.cend();++i){
-				unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
-
-				if(i->second==0) {
-					if (cnt==0&&col_val==col-1) return row_val;
-
-					continue;
-				}
-
-				if(row_val-row0>1) return row0+1;
-				if(last<cnt) continue;
-				if(row_val-row0!=1) {
-					++cnt;
-					if(col_val==col-1 && cnt<last){
-						last=cnt;
-						supp=row_val;
-					}
-				}
-				else {
-					if(cnt<last) {last=cnt+1;supp=row_val;}
-					cnt=1;
-					row0=row_val;
-				}
-			}
-
-			return supp;
-		}
-		matArray submat(unsigned int i0, unsigned int i1, unsigned int j0, unsigned int j1) const {
-			matArray sub;
-			sub.col=j1-j0;
-			sub.row=i1-i0;
-			for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
-				unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
-				if(row_val>=i0&&i1>row_val) {
-					if(col_val>=j0&&j1>col_val) sub.setCoeff(row_val-i0,col_val-j0,i->second);
-				}
-			}
-			return sub;
-		}
-		matArray submat(unsigned int i, unsigned int j) const {
-			matArray sub;
-			sub.col=col-1;
-			sub.row=row-1;
-			for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
-				unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
-				if(row_val<i) {
-					if(col_val<j) sub.setCoeff(row_val,col_val,i->second);
-					else if(col_val>j){
-						sub.setCoeff(row_val,col_val-1,i->second);
-					}
-				}
-				else if(row_val>i){
-					if(col_val<j) sub.setCoeff(row_val-1,col_val,i->second);
-					else if(col_val>j){
-						sub.setCoeff(row_val-1,col_val-1,i->second);
-					}
-				}
-			}
-			return sub;
-		}
-		matArray transpose() const {
-			matArray trans;
-			trans.col=row;
-			trans.row=col;
-			for (_citer i = coeffs.cbegin();i!=coeffs.cend(); ++i){
-				unsigned int col_val=i->first%col, row_val=(i->first-col_val)/col;
-				trans.setCoeff(col_val,row_val,i->second);
-			}
-			return trans;
-		}
-		matArray(const matArray& o):
-			coeffs(o.coeffs),
-			col(o.col),
-			row(o.row){}
-
-	private:
-		_map coeffs;
-		unsigned int row, col;
-		void setCoeff(unsigned int rowId, unsigned int colId, const RNG& scl){
-			if(rowId<row&&colId<col){
-				_iter ii = coeffs.find(rowId*col+colId);
-				if(scl!=0){
-					if(ii!=coeffs.end()) ii->second = scl;
-					else coeffs[rowId*col+colId] = scl;
-				}
-				else if(ii!=coeffs.end()){
-					coeffs.erase(ii);
-				}
-			}
-		}
-		void setCoeff(unsigned int rowId, unsigned int colId, const matArray& m){
-
-			if(col>=m.col+colId && row>=m.row+rowId){
-				for (_citer i = m.coeffs.cbegin(); i!= m.coeffs.cend();++i){
-					unsigned int col0 = i->first/m.col, row0 = (i->first - col0)/m.col;
-					setCoeff(rowId+row0,colId+col0,i->second);
-				}
-			}
-		}
-		matArray(unsigned int rw, unsigned int cl):
-			coeffs(),
-			col(cl),
-			row(rw){}
-	};
 	struct mat_add {
 		matrix<RNG > operator()(const matrix<RNG >& m1, const matrix<RNG >& m2) const {
 			matrix<RNG > sum(m1.sz>m2.sz?m1:m2);
@@ -283,11 +331,11 @@ public:
 		detPtr(0){
 
 	}
-	matrix(const matArray& mArr):matArray(mArr),sz(mArr.col),detPtr(0){}
+	matrix(const matArray& mArr):mat(mArr),sz(mArr.col),detPtr(0){}
 	matrix(const matrix<RNG >& o):
-		matArray(o.mat),
+		mat(o.mat),
 		sz(o.sz),
-		detPtr(o.detPtr==0?0:new RNG(*o.detPtr)){}
+		detPtr(o.detPtr==0?0:new const RNG(*o.detPtr)){}
 	~matrix(){
 		if(detPtr!=0){delete detPtr; detPtr = 0;}
 	}
@@ -331,9 +379,19 @@ public:
 	}
 	void set(unsigned int i, unsigned int j, const RNG& scl) {
 		mat.setCoeff(i,j,scl);
+		if(detPtr!=0){
+			delete detPtr;
+			detPtr=0;
+
+		}
 	}
 	void set(unsigned int i, unsigned int j, const matrix<RNG >& matr) {
 		mat.setCoeff(i,j,matr);
+		if(detPtr!=0){
+			delete detPtr;
+			detPtr=0;
+
+		}
 	}
 	matrix<RNG > subMat(unsigned int i, unsigned int j) const {
 		return matrix<RNG >(mat.submat(i,j));
@@ -344,10 +402,11 @@ public:
 
 private:
 	matArray mat;
-	mutable RNG* detPtr;
+	mutable const RNG* detPtr;
 
 	unsigned int sz;
 	void setDet() const{
+		if(detPtr!=0) return;
 		if(sz==1) {
 			_iter i = mat.coeffs.find(0);
 			detPtr  = i!=mat.coeffs.end()?new RNG(i->second):

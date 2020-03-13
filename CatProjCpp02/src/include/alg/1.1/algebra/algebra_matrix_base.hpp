@@ -222,7 +222,7 @@ public:
 	typedef matArray<RNG >	matArray;
 	typedef typename _map::const_iterator _citer;
 	typedef typename _map::iterator _iter;
-
+	typedef typename matArray::rowIter _riter;
 
 	struct mat_add {
 		matrix<RNG > operator()(const matrix<RNG >& m1, const matrix<RNG >& m2) const {
@@ -377,6 +377,9 @@ public:
 		if(detPtr==0) setDet();
 		return *detPtr;
 	}
+	_riter operator[](unsigned int i) const {
+		return rowIter(mat,i);
+	}
 	void set(unsigned int i, unsigned int j, const RNG& scl) {
 		mat.setCoeff(i,j,scl);
 		if(detPtr!=0){
@@ -393,6 +396,7 @@ public:
 
 		}
 	}
+	unsigned int size() const {return sz;}
 	matrix<RNG > subMat(unsigned int i, unsigned int j) const {
 		return matrix<RNG >(mat.submat(i,j));
 	}

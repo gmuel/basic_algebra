@@ -20,7 +20,7 @@ namespace alg {
 template<unsigned int N >
 struct cyc_rng_obj : public cyclic_wrp<N > {
 	typedef cyclic_wrp<N > _base;
-	cyc_rng_obj(int i = 0):_base(0){}
+	cyc_rng_obj(int i = 0):_base(i){}
 	cyc_rng_obj(const _base& o):_base(o){}
 	cyc_rng_obj& operator=(int i){_base::operator=(i);return *this;}
 	cyc_rng_obj& operator=(const _base& o){_base::operator=(o);return *this;}

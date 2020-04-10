@@ -20,9 +20,11 @@ ostream& operator<<(ostream& o, const c2& c){
 ostream& operator<<(ostream& o, const matrix<c2 >& m){
 	unsigned int sz = m.size();
 	o << "[";
-	for (unsigned int i = 0; i < sz; ++i){
+
+	for (unsigned int i = 0; i < sz;++i){
 		o << "[";
-		for (unsigned int j = 0; j < sz; ++j){
+
+		for (typename matArray<c2 >::rowIter j = m[i];j!=j.endIt;++j){
 			o << m[i][j];
 		}
 		o <<"]\n";

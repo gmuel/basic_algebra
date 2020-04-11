@@ -13,7 +13,7 @@
 namespace alg {
 
 template<typename RNG >
-class matrix;
+class matrix_el;
 template<typename RNG >
 struct mat_add;
 template<typename RNG >
@@ -31,12 +31,25 @@ struct matArray {
 
 	struct rowIter : public _citer {
 		friend struct matArray<RNG >;
-		friend class  matrix<RNG >;
+		friend class  matrix_el<RNG >;
 		rowIter& operator++(){
 			while(*(this)!=endIt && (this->operator->()->first)/ptr->col!=rowIdx)
 				_citer::operator ++();
 			_citer::operator ++();
 			return *this;
+		}
+		rowIter& operator+(unsigned int i) {
+			if(i==1||i==0){
+				return i==1?operator++():*this;
+			}
+			operator++();
+			return operator+(i-1);
+		}
+		const RNG& operator[](unsigned int i) {
+			this->operator+(i);
+			return *this==endIt||
+					(*this!=endIt && (*this).operator*().first%ptr->col!=i)?alg::unit<RNG>::UNIT:
+							this->operator->()->second;
 		}
 		rowIter operator++(int) {
 			rowIter cp (*this);
@@ -61,7 +74,7 @@ struct matArray {
 
 	};
 	friend struct rowIter;
-	friend class matrix<RNG >;
+	friend class matrix_el<RNG >;
 	friend struct mat_add<RNG >;
 	friend struct mat_mul<RNG >;
 	matArray getColumn(unsigned int i) const {
@@ -97,6 +110,10 @@ struct matArray {
 	rowIter end() const {
 		return rowIter(*this,row+1);
 	}
+	/**
+	 * @brief Computes the column index of minimal support, i.e. maximal zero
+	 * entries, used to apply Laplace algorithm to compute 'det'
+	 */
 	unsigned int colMinSupport() const {
 		unsigned int supp(0),cnt(0),last(-1),row0;
 		for(unsigned int i = 0; i<col;++i){
@@ -113,6 +130,10 @@ struct matArray {
 		}
 		return supp;
 	}
+	/**
+	 * @brief Computes row index of minimal support, i.e. maximal zero entries,
+	 * used in 'det' computation
+	 */
 	unsigned int rowMinSupport() const {
 		unsigned int supp(0),cnt(0),last(-1),row0;
 		for(_citer i = coeffs.cbegin(); i!=coeffs.cend();++i){
@@ -142,6 +163,9 @@ struct matArray {
 
 		return supp;
 	}
+	/**
+	 * @brief Returns block submatrix A[i0..i1,j0..j1] of  size (i1-i0) x (j1-j0)
+	 */
 	matArray submat(unsigned int i0, unsigned int i1, unsigned int j0, unsigned int j1) const {
 		matArray sub;
 		sub.col=j1-j0;
@@ -154,6 +178,10 @@ struct matArray {
 		}
 		return sub;
 	}
+	/**
+	 * @brief Returns block submatrix A[i,j] by deleting the i-th row and j-th column
+	 * of size (row-1) x (col-1)
+	 */
 	matArray submat(unsigned int i, unsigned int j) const {
 		matArray sub;
 		sub.col=col-1;
@@ -175,6 +203,9 @@ struct matArray {
 		}
 		return sub;
 	}
+	/**
+	 * @brief Returns the transposed matrix
+	 */
 	matArray transpose() const {
 		matArray trans;
 		trans.col=row;
@@ -220,126 +251,49 @@ struct matArray {
 		col(cl),
 		row(rw){}
 };
-
+template<typename RNG > struct mat_anti;
+template<typename RNG > struct mat_lscl;
+template<typename RNG > struct mat_rscl;
+template<typename RNG > struct mat_id;
+template<typename RNG > struct mat_unit;
 template<
 typename RNG
 >
-class matrix {//:public ...
+class matrix_el : public uassoc_alg<
+
+	matrix_el<RNG >, RNG,
+	mat_add<RNG >,
+	mat_anti<RNG >,
+	mat_lscl<RNG >,
+	mat_rscl<RNG >,
+	mat_mul<RNG >,
+	mat_id<RNG >,
+	mat_unit<RNG > > {
 
 
 public:
+	typedef uassoc_alg<matrix_el<RNG >, RNG,mat_add<RNG >,mat_anti<RNG >,mat_lscl<RNG >,
+				mat_rscl<RNG >,mat_mul<RNG >,mat_id<RNG >,mat_unit<RNG > >
+			_base;
 	typedef std::map<unsigned int,RNG > _map;
 	typedef matArray<RNG >	_mArray;
 	typedef typename _map::const_iterator _citer;
 	typedef typename _map::iterator _iter;
 	typedef typename _mArray::rowIter _riter;
+	friend struct mat_add<RNG >;
 
 
-	struct mat_add {
-		matrix<RNG > operator()(const matrix<RNG >& m1, const matrix<RNG >& m2) const {
-			matrix<RNG > sum(m1.sz>m2.sz?m1:m2);
-			const matrix<RNG >& s1 = m1.sz>m2.sz?m2:m1;
-			for (_citer i = s1.mat.coeffs.cbegin(); i!=s1.mat.coeffs.cend();++i){
-				_iter ii = sum. mat.find(i->first);
-				if(ii==sum.mat.coeffs.end()) sum.mat.coeffs[i->first] = i->second;
-				else {
-					const RNG& slsum = i->second + ii->second;
-					if(slsum!=0) {
-						ii->second = slsum;
-					}
-					else ii.erase();
-				}
-			}
-			return sum;
-		}
-	};
-	struct mat_mul {
-		matrix<RNG > operator()(const matrix<RNG >& m1, const matrix<RNG >& m2) const {
-			matrix<RNG > prd;
-			bool tst=m1.sz>m2.sz;
-			const matrix<RNG >& s1 = tst?m2:m1,
-					& s2 = tst?matrx<RNG >(m1).resize(m1.sz).fillWithDiag(m1.sz-m2.sz):m2;
-			prd.sz = tst?m1.sz:m2.sz;
-			for (_citer i = s1.mat.coeffs.cbegin(); i!=s1.mat.coeffs.cend();++i){
-				unsigned int col1=i->first%s1.mat.col, row1=(i->first-col1)/s1.mat.col;
-				const RNG& scl1 = i->second;
-				for (_citer j = s2.mat.coeffs.cbegin(); j!=s2.mat.coeffs.cend();++j){
-					unsigned int col2=j->first%s2.mat.col, row2=(j->first-col2)/s2.mat.col;
-					const RNG& scl2 = j->second;
-					if(col1!=row2) continue;
-					const RNG& scl = scl1*scl2;
-					if(scl!=0) {
-						unsigned int idx = row1*prd.mat.col+col2;
-						_iter ii = prd.mat.coeffs.find(idx);
-						if(ii==prd.mat.coeffs.end()) {
-							prd.set(row1,col2,scl);
-						}
-						else {
 
-							prd.set(row1,col2,scl + ii->second);
-						}
-					}
-				}
 
-			}
-			return prd;
-		}
 
-	};
-	struct mat_anti {
-		matrix<RNG > operator()(const matrix<RNG >& m) const {
-			matrix<RNG > cp(m);
-			_map& mCp = cp.mat.coeffs;
-			for(_iter i = mCp.begin();mCp.end();++i){
-				i->second = -(i->second);
-			}
-			return cp;
-		}
-	};
-	struct mat_unit {
-		template<typename T>
-		const matrix<RNG >& operator()(const T& arg) const {
-			static matrix<RNG > zero;
-			return zero;
-		}
-	};
-	struct mat_lscl {
-		matrix<RNG > operator()(const RNG& scl, const matrix<RNG >& m) const {
-			matrix<RNG > cp(m);
-			_map& mCp = cp.mat.coeffs;
-			for(_iter i = mCp.begin();mCp.end();++i){
-				i->second = scl*(i->second);
-			}
-			return cp;
-		}
-	};
-	struct mat_rscl {
-		matrix<RNG > operator()(const matrix<RNG >& m, const RNG& scl) const {
-			matrix<RNG > cp(m);
-			_map& mCp = cp.mat.coeffs;
-			for(_iter i = mCp.begin();mCp.end();++i){
-				i->second = (i->second)*scl;
-			}
-			return cp;
-		}
-	};
-
-	struct mat_id{
-		matrix<RNG > operator()(const matrix<RNG >& m1, const matrix<RNG >& m2) const {
-
-		}
-	};
-
-	typedef uassoc_alg<matrix<RNG >, RNG, mat_add,mat_anti,mat_lscl,mat_rscl,mat_mul,mat_id,mat_unit>
-		_uassoc;
 	//A,BASE_RNG,MOD_BINARY,ANTI,LSCAL,RSCAL,ALG_BINARY,ALG_UNIT,UNIT>
-	matrix():mat(),sz(0),detPtr(0){}
+	matrix_el():mat(),sz(0),detPtr(0){}
 	/**
 	 * @brief diagonal constructor
 	 *
 	 * Constructs diagonal matrix $\fscl\cdot I_{\math{szz}}$\f
 	 */
-	matrix(const RNG& scl, unsigned int szz):
+	matrix_el(const RNG& scl, unsigned int szz):
 		mat(szz+1,szz+1),
 		sz(szz),
 		detPtr(0){
@@ -348,18 +302,18 @@ public:
 	/**
 	 * @brief constructs scalar multiple $\fscl \cdot e_{ij}\$f
 	 */
-	matrix(unsigned int i, unsigned int j, const RNG& scl):
+	matrix_el(unsigned int i, unsigned int j, const RNG& scl):
 		mat(i>j?i+1:j+1,i>j?j+1:i+1),
 		sz(mat.col),
 		detPtr(0){
 
 	}
-	matrix(const _mArray& mArr):mat(mArr),sz(mArr.col),detPtr(0){}
-	matrix(const matrix<RNG >& o):
+	matrix_el(const _mArray& mArr):mat(mArr),sz(mArr.col),detPtr(0){}
+	matrix_el(const matrix_el<RNG >& o):
 		mat(o.mat),
 		sz(o.sz),
 		detPtr(o.detPtr==0?0:new const RNG(*o.detPtr)){}
-	~matrix(){
+	~matrix_el(){
 		delDet();
 	}
 	void fillWithDiag(unsigned int diff) {
@@ -371,18 +325,7 @@ public:
 
 		}
 	}
-	void resize(unsigned int new_sz) {
-		delDet();
-		_mArray newMat;
 
-		for (_citer it = mat.coeffs.begin(); it != mat.coeffs.end(); ++it){
-
-			unsigned int j = (it->first)%sz, i = ((it->first)-j)/sz;
-			if(i>=sz||i>=sz) break;
-			newMat[(i+j/new_sz)*new_sz+j%new_sz]=it->second;
-		}
-
-	}
 	void addLeftRowMultiple(unsigned int row, const RNG& scl) {
 		const _mArray& rowMat = mat.getRow(row);
 		for (_citer i = rowMat.coeffs.cbegin(); i!=rowMat.coeffs.cend();++i){
@@ -424,6 +367,27 @@ public:
 	_riter operator[](unsigned int i) const {
 		return _riter(mat,i);
 	}
+	_mArray operator*() {return mat;}
+	const _mArray operator*() const {return mat;}
+	void resize(unsigned int new_sz) {
+		RNG detVal;
+		if(detPtr!=0){
+			detVal=*(detPtr);
+			delDet();
+		}
+		_mArray newMat;
+
+		for (_citer it = mat.coeffs.begin(); it != mat.coeffs.end(); ++it){
+
+			unsigned int j = (it->first)%sz, i = ((it->first)-j)/sz;
+			if(i>=sz||i>=sz) break;
+			newMat[(i+j/new_sz)*new_sz+j%new_sz]=it->second;
+		}
+		mat = newMat;
+		if(detVal!=unit<RNG>::UNIT(detVal)) {
+			detPtr = new const RNG(detVal);
+		}
+	}
 	void set(unsigned int i, unsigned int j, const RNG& scl) {
 		mat.setCoeff(i,j,scl);
 		if(detPtr!=0){
@@ -432,7 +396,7 @@ public:
 
 		}
 	}
-	void set(unsigned int i, unsigned int j, const matrix<RNG >& matr) {
+	void set(unsigned int i, unsigned int j, const matrix_el<RNG >& matr) {
 		mat.setCoeff(i,j,matr);
 		if(detPtr!=0){
 			delete detPtr;
@@ -441,11 +405,11 @@ public:
 		}
 	}
 	unsigned int size() const {return sz;}
-	matrix<RNG > subMat(unsigned int i, unsigned int j) const {
-		return matrix<RNG >(mat.submat(i,j));
+	matrix_el<RNG > subMat(unsigned int i, unsigned int j) const {
+		return matrix_el<RNG >(mat.submat(i,j));
 	}
-	matrix<RNG > subMat(unsigned int i0, unsigned int i1, unsigned int j0, unsigned int j1) const {
-		return matrix<RNG >(mat.submat(i0,i1,j0,j1));
+	matrix_el<RNG > subMat(unsigned int i0, unsigned int i1, unsigned int j0, unsigned int j1) const {
+		return matrix_el<RNG >(mat.submat(i0,i1,j0,j1));
 	}
 
 private:
@@ -486,6 +450,118 @@ private:
 	void delDet(){if(detPtr!=0) {delete detPtr; detPtr = 0;}}
 };
 
+template< typename RNG >
+struct mat_add {
+	typedef typename matrix_el<RNG >::_citer 	_citer;
+	typedef typename matrix_el<RNG >::_iter 	_iter;
+	matrix_el<RNG > operator()(const matrix_el<RNG >& m1, const matrix_el<RNG >& m2) const {
+		matrix_el<RNG > sum(m1.sz>m2.sz?m1:m2);
+		const matrix_el<RNG >& s1 = m1.sz>m2.sz?m2:m1;
+		for (_citer i = s1.mat.coeffs.cbegin(); i!=s1.mat.coeffs.cend();++i){
+			_iter ii = sum. mat.find(i->first);
+			if(ii==sum.mat.coeffs.end()) sum.mat.coeffs[i->first] = i->second;
+			else {
+				const RNG& slsum = i->second + ii->second;
+				if(slsum!=0) {
+					ii->second = slsum;
+				}
+				else ii.erase();
+			}
+		}
+		return sum;
+	}
+};
+template<typename RNG >
+struct mat_mul {
+	typedef typename matrix_el<RNG >::_citer 	_citer;
+	typedef typename matrix_el<RNG >::_iter 	_iter;
+	matrix_el<RNG > operator()(const matrix_el<RNG >& m1, const matrix_el<RNG >& m2) const {
+		matrix_el<RNG > prd;
+		bool tst=m1.sz>m2.sz;
+		const matrix_el<RNG >& s1 = tst?m2:m1,
+				& s2 = tst?matrix_el<RNG >(m1).resize(m1.sz).fillWithDiag(m1.sz-m2.sz):
+						matrix_el<RNG >(m2).resize(m2.sz).fillWithDiag(m2.sz-m1.sz);
+		prd.sz = tst?m1.sz:m2.sz;
+		for (_citer i = s1.mat.coeffs.cbegin(); i!=s1.mat.coeffs.cend();++i){
+			unsigned int col1=i->first%s1.mat.col, row1=(i->first-col1)/s1.mat.col;
+			const RNG& scl1 = i->second;
+			for (_citer j = s2.mat.coeffs.cbegin(); j!=s2.mat.coeffs.cend();++j){
+				unsigned int col2=j->first%s2.mat.col, row2=(j->first-col2)/s2.mat.col;
+				const RNG& scl2 = j->second;
+				if(col1!=row2) continue;
+				const RNG& scl = scl1*scl2;
+				if(scl!=0) {
+					unsigned int idx = row1*prd.mat.col+col2;
+					_iter ii = prd.mat.coeffs.find(idx);
+					if(ii==prd.mat.coeffs.end()) {
+						prd.set(row1,col2,scl);
+					}
+					else {
+
+						prd.set(row1,col2,scl + ii->second);
+					}
+				}
+			}
+
+		}
+		return prd;
+	}
+
+};
+template<typename RNG >
+struct mat_anti {
+	typedef std::map<unsigned int,RNG > 	_map;
+			typedef typename matrix_el<RNG >::_iter 	_iter;
+	matrix_el<RNG > operator()(const matrix_el<RNG >& m) const {
+		matrix_el<RNG > cp(m);
+		_map& mCp = cp.mat.coeffs;
+		for(_iter i = mCp.begin();mCp.end();++i){
+			i->second = -(i->second);
+		}
+		return cp;
+	}
+};
+template<typename RNG >
+struct mat_unit {
+	template<typename T>
+	const matrix_el<RNG >& operator()(const T& arg) const {
+		static matrix_el<RNG > zero;
+		return zero;
+	}
+};
+template<typename RNG >
+struct mat_lscl {
+	typedef std::map<unsigned int, RNG> _map;
+	typedef typename _map::iterator _iter;
+	matrix_el<RNG > operator()(const RNG& scl, const matrix_el<RNG >& m) const {
+		matrix_el<RNG > cp(m);
+		_map& mCp = cp.mat.coeffs;
+		for(_iter i = mCp.begin();mCp.end();++i){
+			i->second = scl*(i->second);
+		}
+		return cp;
+	}
+};
+template<typename RNG >
+struct mat_rscl {
+	typedef std::map<unsigned int, RNG> _map;
+	typedef typename _map::iterator _iter;
+	matrix_el<RNG > operator()(const matrix_el<RNG >& m, const RNG& scl) const {
+		matrix_el<RNG > cp(m);
+		_map& mCp = cp.mat.coeffs;
+		for(_iter i = mCp.begin();mCp.end();++i){
+			i->second = (i->second)*scl;
+		}
+		return cp;
+	}
+};
+template<typename RNG >
+struct mat_id{
+	matrix_el<RNG > operator()(const matrix_el<RNG >& m1) const {
+		static matrix_el<RNG > ONE(1,1);
+		return ONE;
+	}
+};
 }
 
 

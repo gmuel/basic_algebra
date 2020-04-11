@@ -38,8 +38,11 @@ typename ALG_BINARY,
 typename UNIT = unit<A >
 >
 struct algebra : public mod<A,BASE_RNG,MOD_BINARY, ANTI,LSCAL,RSCAL,UNIT> {
-	typedef alg_diag<A,A,MOD_BINARY,ANTI,LSCAL,RSCL,ALG_BINARY,UNIT >			_alg_mod_bind;
-
+	typedef alg_diag<A,A,MOD_BINARY,ANTI,LSCAL,RSCAL,ALG_BINARY,UNIT >			_alg_mod_bind;
+	friend A operator*(const A& a1, const A& a2){
+		static ALG_BINARY bin;
+		return bin(a1,a2);
+	}
 };
 template<typename A,
 typename BASE_RNG,

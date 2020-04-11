@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
-BIN=$(PWD)/bin
-SRC=$(PWD)/src
+BIN=$(PWD)bin
+SRC=$(PWD)src
 TAR=$(BIN)/mat_test
 LIS=$(SRC)/lib
 LIB=$(BIN)/lib

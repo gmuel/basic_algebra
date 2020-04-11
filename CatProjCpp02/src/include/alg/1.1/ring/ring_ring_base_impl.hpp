@@ -15,8 +15,10 @@
 
 namespace alg {
 
-
-
+template<unsigned int N >
+struct cyc_rng_mul;
+template<unsigned int N >
+struct cyc_rng_unit ;
 template<unsigned int N >
 struct cyc_rng_obj : public cyclic_wrp<N > {
 	typedef cyclic_wrp<N > _base;
@@ -24,12 +26,23 @@ struct cyc_rng_obj : public cyclic_wrp<N > {
 	cyc_rng_obj(const _base& o):_base(o){}
 	cyc_rng_obj& operator=(int i){_base::operator=(i);return *this;}
 	cyc_rng_obj& operator=(const _base& o){_base::operator=(o);return *this;}
+	typedef uring<cyc_rng_obj<N >, cyclic_add<N >, cyclic_add_anti<N >,
+			cyc_rng_mul<N >, cyc_rng_unit<N >,cyclic_add_unit<N > > _uring;
 };
 
 template<unsigned int N >
 struct cyc_rng_mul : public binary< cyc_rng_obj<N >, cyc_rng_mul<N > > {
 	cyclic_wrp<N > operator()(const cyc_rng_obj<N >& c1, const cyc_rng_obj<N >& c2) const {
 		return cyc_rng_obj<N >((*c1)*(*c2));
+	}
+};
+
+template<unsigned int N >
+struct cyc_rng_unit {
+	template<typename U >
+	const cyc_rng_obj<N >& operator()(const U& u) const {
+		static cyc_rng_obj<N > ONE(1);
+		return ONE;
 	}
 };
 /*
@@ -47,9 +60,11 @@ private:
 	cyc_unit(const cyc_unit<N >& o);
 };
 
+
 template<unsigned int N >
 struct cyclics {
 	typedef uring<cyclic_wrp<N >, cyclic_add<N >,cyclic_add_anti<N >,cyc_rng_mul<N >,cyc_unit<N > > _urng_bind;
+	//cyclics(int i = 0)
 };
 
 

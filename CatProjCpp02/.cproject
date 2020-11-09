@@ -48,10 +48,6 @@
                     <extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
                     					
                     <extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
                     				
                 </extensions>
                 			
@@ -67,7 +63,7 @@
                             							
                             <targetPlatform id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform.1348832171" isAbstract="false" name="GNU Autotools Target Platform" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform"/>
                             							
-                            <builder arguments="" buildPath="${workspace_loc:/CatProjCpp02}" cleanBuildTarget="" command="${workspace_loc:/CatProjCpp02}/build/build_script.sh" enableCleanBuild="false" enabledIncrementalBuild="true" id="cdt.managedbuild.builder.gnu.cross.2009534165" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross">
+                            <builder arguments="" buildPath="${workspace_loc:/CatProjCpp02}" cleanBuildTarget="" command="${workspace_loc:/CatProjCpp02}/build/build_script.sh" enableCleanBuild="false" enabledIncrementalBuild="true" id="cdt.managedbuild.builder.gnu.cross.2009534165" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" name="Gnu Make Builder">
                                 								
                                 <outputEntries>
                                     									
@@ -182,10 +178,6 @@
                     <extension id="org.eclipse.cdt.core.GNU_ELF" point="org.eclipse.cdt.core.BinaryParser"/>
                     					
                     <extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-                    					
-                    <extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
                     				
                 </extensions>
                 			
@@ -201,7 +193,7 @@
                             							
                             <targetPlatform id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform.471397079" isAbstract="false" name="GNU Autotools Target Platform" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.targetPlatform"/>
                             							
-                            <builder arguments="" buildPath="${workspace_loc:/CatProjCpp02}/" cleanBuildTarget="" command="${workspace_loc:/CatProjCpp02}/build/mat_test.mk" enableCleanBuild="false" enabledIncrementalBuild="true" id="cdt.managedbuild.builder.gnu.cross.1655077858" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross">
+                            <builder arguments="" buildPath="${workspace_loc:/CatProjCpp02}/" cleanBuildTarget="" command="${workspace_loc:/CatProjCpp02}/build/mat_test.mk" enableCleanBuild="false" enabledIncrementalBuild="true" id="cdt.managedbuild.builder.gnu.cross.1655077858" incrementalBuildTarget="" keepEnvironmentInBuildfile="false" name="Gnu Make Builder">
                                 								
                                 <outputEntries>
                                     									

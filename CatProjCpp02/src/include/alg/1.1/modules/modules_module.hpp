@@ -165,11 +165,18 @@ typename LSCAL,
 typename RSCAL,
 typename UNIT = unit<M >
 >
-struct mod : public cat::cat<mod_diag<M,BINARY,ANTI,LSCAL,RSCAL,UNIT > > {
+struct mod : public abel<M,BINARY,ANTI,UNIT > {
+	//cat::cat<mod_diag<M,BINARY,ANTI,LSCAL,RSCAL,UNIT > > {
 	typedef mod_diag<M,BINARY,ANTI,LSCAL,RSCAL,UNIT >		_mod_bind;
 	typedef lmod<M,BINARY,ANTI,LSCAL,UNIT>					_lmod;
 	typedef	rmod<M,BINARY,ANTI,RSCAL,UNIT>					_rmod;
 	typedef M												_obj;
+	friend M operator*(const BASE_RNG& r, const M& m){
+		return LSCAL(r,m);
+	}
+	friend M operator*(const M& m, const BASE_RNG& r){
+		return RSCAL(m,r);
+	}
 };
 
 

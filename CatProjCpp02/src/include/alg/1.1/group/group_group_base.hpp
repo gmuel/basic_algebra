@@ -202,6 +202,12 @@ typename UNIT = unit<GRP > >
 struct abel : public cat::cat<abel_diag<GRP,BINARY, ANTI, UNIT > > {
 	typedef group<GRP,BINARY,ANTI,UNIT > 			_grp_bind;
 	typedef abel_diag<GRP,BINARY, ANTI, UNIT > 		_abl_bind;
+	friend GRP operator+<>(const GRP& g1, const GRP& g2){
+		return BINARY(g1,g2);
+	}
+	friend GRP operator-(const GRP& g){
+		return ANTI(g);
+	}
 };
 /*template<typename GROUP, typename BINARY,
 typename ANTI,

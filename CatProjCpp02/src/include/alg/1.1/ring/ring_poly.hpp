@@ -12,12 +12,12 @@
 #include <map>
 #include <utility>
 namespace alg {
-template<typename RNG , typename MON>
+template<typename RNG , typename MON, typename ORD>
 class poly {
 	typedef typename MON::_mon_bind _mon_bind;
 	typedef typename RNG::_rng_bind _rng_bing;
-	typedef poly<MON,RNG > 			_ths;
-	typedef std::map<MON,RNG> 				_map;
+	typedef poly<MON,RNG, ORD > 			_ths;
+	typedef std::map<MON,RNG,ORD> 				_map;
 	typedef typename _map::iterator 		_iter;
 	typedef typename _map::const_iterator 	_citer;
 	_map coeffs;
@@ -110,7 +110,7 @@ public:
 
 };
 
-}
+} /* alg */
 
 
 #endif /* INCLUDE_ALG_1_1_RING_RING_POLY_HPP_ */

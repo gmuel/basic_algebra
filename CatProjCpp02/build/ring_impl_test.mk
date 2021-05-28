@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
-BIN=$(PWD)bin
-SRC=$(PWD)src
+BIN=$(PWD)/../bin
+SRC=$(PWD)/../src
 TAR=$(BIN)/ring_test
 LIS=$(SRC)/lib
 LIB=$(BIN)/lib
@@ -18,3 +18,6 @@ $(CYC) : $(CYS) $(CYH)
 	
 $(COM) : $(LIS)/ring_test.cpp $(SRC)/include/ring_base_impl.hpp
 	$(CC) -c $< -o $@
+	
+$(LNS) :
+	ln -s $(BIN) $(PWD)build-ringtestbin   

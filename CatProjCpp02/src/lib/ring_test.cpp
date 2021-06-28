@@ -25,7 +25,7 @@ ostream& operator<<(ostream& o, const cyc_rng_obj<N > c){
 }
 
 _c2 operator+(const _c2& cc0, const _c2& cc1){
-	return alg::operator +<cyclic_wrp<2u > >(cc0,cc1);
+	return operator+((cyclic_wrp<2u >)cc0,(cyclic_wrp<2u >) cc1);
 }
 
 int main (){

@@ -74,7 +74,10 @@ struct cyclic_group_diag : public alg::group_diag<cyclic_wrp<N >,
 template<unsigned int N >
 struct cyclic_group : public group<cyclic_wrp<N >,
 cyclic_add<N >, cyclic_add_anti<N >,cyclic_add_unit<N > > {
-
+	typedef cyclic_wrp<N >	_cyc_el;
+	typedef cyclic_add<N >		_cyc_ad;
+	typedef cyclic_add_anti<N >	_cyc_at;
+	INCLUDE_ALG_1_1_GROUP_BASE_HPP_LOCAL_ABEL_FRNDS(cyc_el, cycl_ad, cyclic_add_anti<N > )
 };
 
 

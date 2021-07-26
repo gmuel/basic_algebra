@@ -117,5 +117,5 @@ bool operator==(const cycle_iterator& i1, const cycle_iterator& i2){
 	return false;
 
 }
-} /*alg*
+} /*alg*/
 

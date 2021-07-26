@@ -11,6 +11,7 @@
 #include <list>
 #include <iostream>
 #include <string>
+namespace alg {
 typedef unsigned int _uint;
 class cycle_iterator;
 class cycle_parser;
@@ -74,7 +75,7 @@ public:
 	friend bool operator==(const cycle_iterator& i1, const cycle_iterator& i2);
 };
 
-
+} /*alg*/
 
 
 #endif /* INCLUDE_ALG_1_1_GROUP_GROUP_CYCLIC_HPP_ */

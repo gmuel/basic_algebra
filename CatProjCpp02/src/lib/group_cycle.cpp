@@ -22,7 +22,7 @@ const string& cycle_parser::SEMICOLON_DEL 	= ";";
 typedef typename std::list<string>::const_iterator _lciter;
 string replaceAll(const string& s, const string& sub,const string& repl) {
 	stringstream ss(s);
-	_uint idx = s.rfind(sub), lng = s.length();
+	int idx = s.rfind(sub), lng = s.length();
 	while (idx>=0) {
 		ss.str(ss.str().replace(idx,lng,repl));
 		idx=ss.str().rfind(sub);
@@ -37,73 +37,80 @@ string stripBraces(const string& s){
 std::list<string> splitString(const string& s, const string sub) {
 	stringstream cp(s);
 	std::list<string> lst;
-	_uint idx = cp.str().rfind(sub), lng = sub.length(), last = s.length();
-	while(idx>=0) {
+	int idx = cp.str().rfind(sub), lng = sub.length(), last = s.length();
+	while(true) {
 		string tmp = cp.str();
 		lst.push_back(tmp.substr(idx+lng,last));
 		last = idx;
 		cp.str(tmp.substr(0,last));
 		idx=cp.str().rfind(sub);
+		if(idx<0) {
+			lst.push_back(cp.str());
+			break;
+		}
 	}
 	return lst;
 }
 
-
-bool cycle_parser::parse() {
-
-	int commDelIdx = input.rfind(COMMA_DEL), semiDelIdx = input.rfind(SEMICOLON_DEL),
-		length = input.length(), st0 = length;
+bool getDelimiterAndLastIndex (const std::string& input, std::string& del, _uint& idx) {
+	int commDelIdx = input.rfind(cycle_parser::COMMA_DEL), semiDelIdx = input.rfind(cycle_parser::SEMICOLON_DEL),
+			length = input.length(), st0 = length;
 	bool t1 = commDelIdx>=0, t2 = semiDelIdx>=0;
 	if (t1!=t2) {
-		cyc = cycle();
-		std::string del;
-		_uint idx;
 		if(t1){
-			del = COMMA_DEL;
+			del = cycle_parser::COMMA_DEL;
 			idx = commDelIdx;
 		}
 		else {
-			del = SEMICOLON_DEL;
+			del = cycle_parser::SEMICOLON_DEL;
 			idx = semiDelIdx;
-		}
-		std::list<std::string > lst = alg::splitString(input,del);
-		_uint curr , next;
-		std::stringstream is;
-		bool firstSeen=false;
-		for(std::list<std::string>::const_iterator i = lst.cbegin(); i!=lst.cend(); ++i){
-			if(!firstSeen) {
-				is.str(*i);
-				is >> next;
-				if(is.failbit){
-					cyc = cycle::EMPTY_CYCLE;
-					return false;
-				}
-				cyc.start = next;
-				firstSeen = true;
-				continue;
-			}
-			curr = next;
-			is.str(*i);
-
-			if(is.failbit){
-				cyc = cycle::EMPTY_CYCLE;
-				return false;
-			}
-			is >> next;
-			if(cyc.map.find(next)!=cyc.map.end()) {
-				break;
-			}
-			cyc.map[curr] = next;
 		}
 		return true;
 	}
 	return false;
 }
 
+bool cycle_parser::parse() {
+	std::string del;
+	_uint idx;
+	if(!getDelimiterAndLastIndex(input,del,idx)) return false;
+
+	std::list<std::string > lst = alg::splitString(stripBraces(input),del);
+	_uint curr , next;
+	std::stringstream is;
+	bool firstSeen=false;
+	for(std::list<std::string>::const_iterator i = lst.cbegin(); i!=lst.cend(); ++i){
+		if(!firstSeen) {
+			is.str(*i);
+			is >> next;
+			//				if(is.failbit){
+			//					return false;
+			//				}
+			cyc.start = next;
+			firstSeen = true;
+			continue;
+		}
+		curr = next;
+		is.str(*i);
+		is >> next;
+		//			if(is.failbit){
+		//				return false;
+		//			}
+
+		if(!cyc.add(curr,next)) {
+			break;
+		}
+	}
+	cyc.add(next,cyc.start);
+	cyc.fin = next;
+	return true;
+}
+//cycle_iterator cycle::end() const {return cycle(cycle_iterator(cycle::EMPTY_CYCLE));}
 cycle cycle::getCycle(const std::string& s, cycle_parser& cp){
 	cp.setInput(s);
 	return cp.parse()?cp.getCycle():EMPTY_CYCLE;
 }
+cycle::cycle(const cycle& o):map(o.map),start(o.start),fin(o.fin){}
 bool operator==(const cycle& c1, const cycle& c2){
 	return c1.length()==c2.length()?c1.map==c2.map:false;
 }
@@ -116,6 +123,39 @@ bool operator==(const cycle_iterator& i1, const cycle_iterator& i2){
 	}
 	return false;
 
+}
+bool cycle::add(_uint i, uint j) {
+	if(i==j) return false;
+	bool t1 = i == fin, t2 = map.find(i)==map.end();
+	if(t1 || t2) {
+		map[i] = j;
+		return true;
+	}
+	return false;
+}
+cycle_iterator& cycle_iterator::operator+(const _uint& i) {
+	if(ref.map.find(i)!=ref.map.end()) return *this;
+	ref.map[ref.fin] = i;
+	ref.fin = i;
+	curr = i;
+	ref.map[i] = ref.start;
+	return *this;
+}
+std::ostream& operator<<(std::ostream& o, const cycle& c){
+	o << "(";
+	_uint lst = c.fin, frst = c.start;
+	while(c.map.size()>1) {
+		o << lst;
+		if(lst!=frst) {
+			o << ",";
+		}
+		else {
+			break;
+		}
+		lst = c(lst);
+	}
+	o << ")";
+	return o;
 }
 } /*alg*/
 

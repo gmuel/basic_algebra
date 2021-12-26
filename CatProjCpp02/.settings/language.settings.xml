@@ -19,7 +19,7 @@
         	
     </configuration>
     	
-    <configuration id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.420391609.1883930278" name="mat_test">
+    <configuration id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.420391609.279326666" name="cycle_lib">
         		
         <extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
             			
@@ -37,7 +37,7 @@
         	
     </configuration>
     	
-    <configuration id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.420391609.1883930278.11217719" name="ringtest">
+    <configuration id="org.eclipse.linuxtools.cdt.autotools.core.toolChain.420391609.279326666.571958885" name="test_cycle">
         		
         <extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
             			

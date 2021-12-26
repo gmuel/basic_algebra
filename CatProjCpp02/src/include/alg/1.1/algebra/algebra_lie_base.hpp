@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_ALGEBRA_ALGEBRA_LIE_BASE_HPP_
 
 
-#include "algebra_base.hpp"
+#include "algebra_algebra_base.hpp"
 
 namespace alg {
 /**

@@ -39,6 +39,7 @@ struct cyclic_wrp {
 		return *this;
 	}
 	const cyclic<N>& operator*() const {return *ptr;}
+	const cyclic<N>* operator->() const {return ptr;}
 private:
 	const cyclic<N>* ptr;
 };

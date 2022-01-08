@@ -17,7 +17,7 @@ class symmetric {
 
 public:
 	typedef alg::cyclic_wrp<N >				_cyclic;
-	typedef std::map<_cyclic,cyclic >		_map;
+	typedef std::map<_cyclic,_cyclic >		_map;
 	typedef alg::cyclic_add_unit			_cyc_add_unit;
 	typedef typename _map::const_iterator 	_c_iter;
 	typedef typename _map::iterator			_iter;
@@ -130,13 +130,16 @@ public:
 	/**
 	 * @brief unidirectional permutation iterator
 	 *
-	 * Traverses any permutation in cycles order
+	 * Traverses any permutation in cycles order where the cycle with the lowest
+	 * entry gets traversed next
 	 */
-	friend struct const_sym_iterator {
+	friend class const_sym_iterator {
 		_map sym;
 		_c_iter it,& e;
+
 		//const _cyclic*	currentFirst;
 		_cyclic current;
+	public:
 		const_sym_iterator(const symmetric<N>& o):sym(o.symMap),it(sym.begin())
 			,current(),e(sym.end()){
 
@@ -180,10 +183,12 @@ public:
 	/**
 	 * @Mutator iterator - not intended for traversal
 	 */
-	friend struct sym_iterator {
+	friend class sym_iterator {
 		_map& sym;
 		_iter it,& e;
+
 		_cyclic current;
+	public:
 		sym_iterator(const symmetric<N>& o):sym(o.symMap),it(sym.begin())
 			,current(),e(sym.end()){
 
@@ -217,6 +222,7 @@ public:
 			}
 			return true;
 		}
+
 	};
 	const_sym_iterator
 #if __cplusplus < 201103L
@@ -237,6 +243,22 @@ public:
 				const {
 		return const_sym_iterator(*this);
 	}
+	sym_iterator find(const _cyclic& c){
+		sym_iterator it(*this);
+		it.it = symMap.find(c);
+		if(it.it==symMap.end())
+			return sym_iterator(UNIT());
+		it.current = c;
+		return it;
+	}
+
+#if __cplusplus < 201103L
+#else
+	sym_iterator erase(sym_iterator i){
+
+		return i;
+	}
+#endif
 	/**
 	 * @brief map def
 	 */

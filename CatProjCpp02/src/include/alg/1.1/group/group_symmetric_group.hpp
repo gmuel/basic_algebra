@@ -9,6 +9,7 @@
 #define INCLUDE_ALG_1_1_GROUP_GROUP_SYMMETRIC_GROUP_HPP_
 #include "group_cycles.hpp"
 #include <map>
+#include <set>
 namespace alg {
 
 template<unsigned int N>
@@ -26,12 +27,18 @@ public:
 	}
 	template<typename ITER_TYPE>
 	symmetric(ITER_TYPE i, ITER_TYPE e):symMap(){
-		if(i!=e) symMap[*i] = *i;
-		++i;
-		while(i!=e){
-
+		if(i!=e) {
+			const _cyclic* first = &(*i);
+			symMap[*first] = *first;
 			++i;
+			while(i!=e&&symMap.size()<N){
+				insert(*first,*i);
+				first = &(*i);
+				++i;
+			}
+			symMap[*first] = symMap.begin()->first;
 		}
+		else symMap[CYCLIC_ADD_UNIT()] = CYCLIC_ADD_UNIT();
 	}
 
 	bool contains(const _cyclic& i) const {
@@ -42,12 +49,7 @@ public:
 	}
 
 	void insert(const _cyclic& match, const _cyclic& newElement) {
-		if(symMap.find(newElement)!=symMap.end()) return;
-		_iter it = symMap.find(match);
-		if (it==symMap.end()) return;
-		const _cyclic& tmp = it->second;
-		it->second = newElement;
-		symMap[newElement] = tmp;
+
 	}
 	unsigned int length() const {
 		return symMap.size();
@@ -59,6 +61,7 @@ public:
 			return UNIT;
 		}
 	};
+	static const sym_unit& UNIT;
 	friend struct sym_anti {
 		symmetric<N > operator()(const symmetric<N>& arg) const {
 			return arg.reverse();
@@ -101,8 +104,15 @@ public:
 
 			}
 			default:{
-				for(_iter i = prod.symMap.begin();i!=prod.symMap.end();++i){
-					if(i->first==i->second) prod.symMap.erase(i);
+				_iter i = prod.symMap.begin(), e = prod.symMap.end();
+				while(i!=e){
+
+					if(i->first==i->second)
+#if __cplusplus <201103L
+						prod.symMap.erase(i);
+#else
+						i = prod.symMap.erase(i);
+#endif
 				}
 				clean(prod);
 			}
@@ -112,11 +122,125 @@ public:
 			if(i2->first!=ii->second) prod.symMap[i2->first] = ii->second;
 		}
 	};
+	friend struct sym_eq {
+		bool operator()(const symmetric<N>& s1, const symmetric<N>& s2) const {
+			return s1.symMap==s2.symMap;
+		}
+	};
+	/**
+	 * @brief unidirectional permutation iterator
+	 *
+	 * Traverses any permutation in cycles order
+	 */
+	friend struct const_sym_iterator {
+		_map sym;
+		_c_iter it,& e;
+		//const _cyclic*	currentFirst;
+		_cyclic current;
+		const_sym_iterator(const symmetric<N>& o):sym(o.symMap),it(sym.begin())
+			,current(),e(sym.end()){
 
+			current = it->first;
+		}
+		const_sym_iterator(const const_sym_iterator& o):sym(o.sym),it(sym.begin())
+			,current(),e(sym.end()){
+
+			current = it->first;
+		}
+		const_sym_iterator& operator++() {
+
+			_iter removeIt = sym.find(current);
+			if(removeIt==e) return *this;
+			const _cyclic& img = removeIt->second;
+			sym.erase(removeIt);
+			if(it->first!=img) {
+				current = img;
+			}
+			else {
+				++it;
+				if(it!=e){
+					current = it->first;
+				}
+			}
+
+
+			return *this;
+		}
+		const _cyclic* operator->() const {return &current;}
+		friend bool operator==(const const_sym_iterator& c1, const const_sym_iterator& c2){
+			unsigned int sz1 = c1.sym.size(), sz2 = c2.sym.size();
+			if(sz1<=1&&sz2<=1) return true;
+			return sz1==sz2?c1.sym==c2.sym:false;
+		}
+		friend bool operator!=(const const_sym_iterator& i1, const const_sym_iterator& i2){
+			return !(i1==i2);
+		}
+
+	};
+	/**
+	 * @Mutator iterator - not intended for traversal
+	 */
+	friend struct sym_iterator {
+		_map& sym;
+		_iter it,& e;
+		_cyclic current;
+		sym_iterator(const symmetric<N>& o):sym(o.symMap),it(sym.begin())
+			,current(),e(sym.end()){
+
+			current = it->first;
+		}
+		sym_iterator(const const_sym_iterator& o):sym(o.sym),it(sym.begin())
+			,current(),e(sym.end()){
+
+			current = it->first;
+		}
+		bool insert(const _cyclic& hint, const _cyclic& newElement){
+			if(sym.find(newElement)!=e || sym.size()>N+1) return false;
+			_iter it = sym.find(hint);
+			if (it==e) return false;
+			const _cyclic& tmp = it->second;
+			it->second = newElement;
+			sym[newElement] = tmp;
+			return true;
+		}
+		bool erase(const _cyclic& rm){
+			_iter i = sym.find(rm);
+			if(i!=e) return false;
+			const _cyclic& tmp = i->second;
+			sym.erase(i);
+			for(_iter ii = sym.begin();ii!=e;++ii){
+				if(ii->second == rm) {
+					ii->second = tmp;
+					break;
+				}
+
+			}
+			return true;
+		}
+	};
+	const_sym_iterator
+#if __cplusplus < 201103L
+			end()
+#else
+			cend()
+#endif
+			const {
+		return const_sym_iterator(UNIT());
+	}
+
+	const_sym_iterator
+#if __cplusplus < 201103L
+			begin()
+#else
+			cbegin()
+#endif
+				const {
+		return const_sym_iterator(*this);
+	}
 	/**
 	 * @brief map def
 	 */
-	const _cyclic& operator()(const _cyclic& i) const {
+	_cyclic operator()(const _cyclic& i) const {
 		_c_iter c = symMap.find(i);
 		return c==symMap.end()?
 				i:

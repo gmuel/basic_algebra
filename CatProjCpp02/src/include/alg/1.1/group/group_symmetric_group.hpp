@@ -279,6 +279,14 @@ public:
 				i:
 					c->second;
 	}
+	sym_iterator operator()(const _cyclic& hint, const _cyclic& newElement) {
+		sym_iterator i(*this);
+		i.insert(hint, newElement);
+		return i;
+	}
+	sym_iterator operator()(const _cyclic& c) {
+		return operator()(firstElement(),c);
+	}
 	unsigned int operator()(unsigned int i) const {
 		return this->operator()(i)->value();
 	}

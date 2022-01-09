@@ -2,3 +2,4 @@
 CatProjCpp02/bin
 *.DS_Store
 .*
+.cproject

@@ -29,13 +29,16 @@ struct cyclic_wrp {
 	cyclic_wrp(const cyclic<N>& val):ptr(&val){}
 	cyclic_wrp(const cyclic_wrp<N >& o):ptr(o.ptr){}
 	~cyclic_wrp(){ptr=0;}
-	cyclic_wrp<N >& operator=(int val);
+	cyclic_wrp<N >& operator=(int val){
+		ptr = cyclic<N>::VALS[val];
+		return *this;
+	}
 	cyclic_wrp<N >& operator=(const cyclic<N>& val){
-
+		ptr = &val;
 		return *this;
 	}
 	cyclic_wrp<N >& operator=(const cyclic_wrp<N>& val){
-		val.ptr==ptr?:ptr=val.ptr;
+		if(val.ptr!=ptr)ptr=val.ptr;
 		return *this;
 	}
 	const cyclic<N>& operator*() const {return *ptr;}
@@ -53,6 +56,9 @@ struct cyclic_add : public binary<cyclic_wrp<N >, cyclic_add<N > > {
 template<unsigned int N>
 struct cyclic_add_unit : public unit<cyclic_wrp<N > > {
 	typedef cyclic_wrp<N > _cyclic;
+	const _cyclic& operator()() const {
+		return this->operator ()(N);
+	}
 	template<typename U >
 	const _cyclic& operator()(const U& u) const {
 		static _cyclic zero;
@@ -78,7 +84,7 @@ cyclic_add<N >, cyclic_add_anti<N >,cyclic_add_unit<N > > {
 	typedef cyclic_wrp<N >	_cyc_el;
 	typedef cyclic_add<N >		_cyc_ad;
 	typedef cyclic_add_anti<N >	_cyc_at;
-	INCLUDE_ALG_1_1_GROUP_BASE_HPP_LOCAL_ABEL_FRNDS(cyc_el, cycl_ad, cyclic_add_anti<N > )
+	INCLUDE_ALG_1_1_GROUP_BASE_HPP_LOCAL_ABEL_FRNDS(_cyc_el, _cyc_ad, cyclic_add_anti<N > )
 };
 
 

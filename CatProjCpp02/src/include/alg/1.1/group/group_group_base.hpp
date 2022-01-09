@@ -152,7 +152,6 @@ template<typename GROUP, typename ANTI >
 GROUP operator/(const GROUP& g1, const GROUP& g2) {
 	return g1 * antipode<GROUP,ANTI >::ANTIPODE(g2);
 }
-template
 template<typename GROUP, typename BINARY,
 typename ANTI,
 typename UNIT = unit<GROUP > >
@@ -205,14 +204,14 @@ struct abel : public cat::cat<abel_diag<GRP,BINARY, ANTI, UNIT > > {
 	typedef abel_diag<GRP,BINARY, ANTI, UNIT > 		_abl_bind;
 
 };
-template<
-	typename X,
-	>
-struct binary
+//template<
+//	typename X,
+//	>*/
+//struct binary
 #ifndef INCLUDE_ALG_1_1_GROUP_BASE_HPP_LOCAL_ABEL_FRNDS
 #define INCLUDE_ALG_1_1_GROUP_BASE_HPP_LOCAL_ABEL_FRNDS(ABL,BIN,ANT) \
-	friend ABL operator+(const ABL& a1, const ABL& a2 ) const {static BIN bin; return bin(a1,a2);} \
-	friend ABL operator-(const ABL& a) const {static ANT ant; return ant(a);}
+	friend ABL operator+(const ABL& a1, const ABL& a2 ) {static BIN bin; return bin(a1,a2);} \
+	friend ABL operator-(const ABL& a) {static ANT ant; return ant(a);}
 #endif
 /*template<typename GROUP, typename BINARY,
 typename ANTI,

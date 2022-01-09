@@ -17,23 +17,28 @@ class symmetric {
 
 public:
 	typedef alg::cyclic_wrp<N >				_cyclic;
-	typedef std::map<_cyclic,_cyclic >		_map;
-	typedef alg::cyclic_add_unit			_cyc_add_unit;
+	struct less_cyclic {
+		bool operator()(const _cyclic& c1, const _cyclic& c2) const {
+			return c1.operator ->()<c2.operator ->();
+		}
+	};
+	typedef std::map<_cyclic,_cyclic,less_cyclic >		_map;
+	typedef alg::cyclic_add_unit<N>			_cyc_add_unit;
 	typedef typename _map::const_iterator 	_c_iter;
 	typedef typename _map::iterator			_iter;
-	static const _cyc_add_unit CYCLIC_ADD_UNIT;
+	static const _cyc_add_unit& CYCLIC_ADD_UNIT;
 	symmetric():symMap(){
 		symMap[CYCLIC_ADD_UNIT()] = CYCLIC_ADD_UNIT();
 	}
 	template<typename ITER_TYPE>
 	symmetric(ITER_TYPE i, ITER_TYPE e):symMap(){
 		if(i!=e) {
-			const _cyclic* first = &(*i);
-			symMap[*first] = *first;
+			_cyclic first(*i);
+			symMap[first] = first;
 			++i;
 			while(i!=e&&symMap.size()<N){
-				insert(*first,*i);
-				first = &(*i);
+				insert(first,*i);
+				first = *i;
 				++i;
 			}
 			symMap[*first] = symMap.begin()->first;
@@ -55,20 +60,20 @@ public:
 		return symMap.size();
 	}
 
-	friend struct sym_unit {
+	struct sym_unit {
 		static const symmetric<N >& UNIT;
 		const symmetric<N>& operator()() const {
 			return UNIT;
 		}
 	};
 	static const sym_unit& UNIT;
-	friend struct sym_anti {
+	struct sym_anti {
 		symmetric<N > operator()(const symmetric<N>& arg) const {
 			return arg.reverse();
 		}
 	};
 
-	friend struct sym_multi {
+	struct sym_multi {
 		symmetric<N > operator()(const symmetric<N>& p1, const symmetric<N >& p2) const {
 			_c_iter i2 = p2.symMap.begin(), e2 = p2.symMap.end(),
 					i1 = p1.symMap.begin(), e1 = p1.symMap.end();
@@ -122,7 +127,8 @@ public:
 			if(i2->first!=ii->second) prod.symMap[i2->first] = ii->second;
 		}
 	};
-	friend struct sym_eq {
+	friend struct sym_multi;
+	struct sym_eq {
 		bool operator()(const symmetric<N>& s1, const symmetric<N>& s2) const {
 			return s1.symMap==s2.symMap;
 		}
@@ -133,7 +139,7 @@ public:
 	 * Traverses any permutation in cycles order where the cycle with the lowest
 	 * entry gets traversed next
 	 */
-	friend class const_sym_iterator {
+	class const_sym_iterator {
 		_map sym;
 		_c_iter it,& e;
 
@@ -180,10 +186,11 @@ public:
 		}
 
 	};
+	friend class const_sym_iterator;
 	/**
 	 * @Mutator iterator - not intended for traversal
 	 */
-	friend class sym_iterator {
+	class sym_iterator {
 		_map& sym;
 		_iter it,& e;
 
@@ -224,6 +231,7 @@ public:
 		}
 
 	};
+	friend class sym_iterator;
 	const_sym_iterator
 #if __cplusplus < 201103L
 			end()
@@ -253,6 +261,9 @@ public:
 	}
 
 #if __cplusplus < 201103L
+	void erase(sym_iterator i){
+
+	}
 #else
 	sym_iterator erase(sym_iterator i){
 
@@ -287,6 +298,9 @@ private:
 	_map symMap;
 };
 
+
+template <unsigned int N >
+const cyclic_add_unit<N>& symmetric<N >::CYCLIC_ADD_UNIT = cyclic_add_unit<N> ();
 }
 
 

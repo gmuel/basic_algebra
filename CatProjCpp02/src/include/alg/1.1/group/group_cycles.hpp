@@ -108,7 +108,7 @@ public:
 
 	}
 
-	friend struct const_cycle_iter {
+	struct const_cycle_iter {
 		const cycle_element& ref;
 		const _cyclic* ptr;
 		const_cycle_iter(const cycle_element& el):ref(el),ptr(&ref.firstElement()){
@@ -128,6 +128,8 @@ public:
 			return ptr;
 		}
 	};
+
+	friend struct const_cycle_iter;
 
 	cycle_element reverse() const {
 		_c_iter it = map.begin(), e = map.end();

@@ -9,8 +9,8 @@
 #define INCLUDE_ALG_1_1_MODULES_MODULES_TENSOR_HPP_
 
 
-#include "module.hpp"
-
+#include "modules_module.hpp"
+#include <map>
 namespace alg {
 
 template<typename RMOD,

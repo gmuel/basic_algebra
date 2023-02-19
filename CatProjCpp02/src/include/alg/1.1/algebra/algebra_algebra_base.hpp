@@ -9,7 +9,7 @@
 #define INCLUDE_ALG_1_1_ALGEBRA_ALGEBRA_ALGEBRA_BASE_HPP_
 
 
-#include "../modules/modules_module.hpp"
+#include "../modules/modules_tensor.hpp"
 
 namespace alg {
 

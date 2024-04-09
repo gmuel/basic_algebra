@@ -9,7 +9,7 @@ MAI=$(SRC)/lib/mat_test.cpp
 CYS=$(SRC)/lib/cyclics.cpp
 CYH=$(SRC)/include/cyclics.hpp
 COM=$(BIN)/lib/mat_test.o
-CC=g++ -g
+CC=g++-9 -g
 $(TAR) : $(COM) $(CYC)
 	$(CC) $^ -o $@
 

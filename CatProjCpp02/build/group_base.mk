@@ -1,2 +1,2 @@
 bin/group_base : src/lib/group_base.cpp
-	g++ $< -o $@
+	g++-9 $< -o $@

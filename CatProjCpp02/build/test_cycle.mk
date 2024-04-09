@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-CC=g++ -g -m64
+CC=g++-9 -g -m64
 INC=src/include/
 LIB=src/lib/
 BIN=bin/

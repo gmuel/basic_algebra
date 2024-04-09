@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-CC=g++ -g
+CC=g++-9 -g
 BIN=bin/
 SRC=src/
 INC=$(SRC)include/

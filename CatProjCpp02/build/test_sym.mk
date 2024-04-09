@@ -6,7 +6,7 @@ LIB=$(SRC)lib/
 LIO=$(BIN)lib/
 OBJ=$(LIO)sym_test.o
 TAR=$(BIN)test
-CC=g++ -g -m64
+CC=g++-9 -g -m64
 
 all : $(TAR)
 .PHONY :$(OBJ)

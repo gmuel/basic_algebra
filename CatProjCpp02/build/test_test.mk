@@ -5,7 +5,7 @@ LIB=$(SRC)lib/
 LIO=$(BIN)lib/
 OBJ = $(LIO)test_list.o
 TAR = $(BIN)test
-CC=g++ -g
+CC=g++-9 -g
 all : $(TAR)
 .PHONY :$(OBJ)
 $(TAR) : $(OBJ)

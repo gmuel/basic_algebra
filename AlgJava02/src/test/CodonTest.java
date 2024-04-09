@@ -19,8 +19,9 @@ public class CodonTest {
     public static final File PROT = new File (PATH+"NM_011897_3transl.txt");
     public static String readFile (File input){
         StringBuffer strb = new StringBuffer ();
+        BufferedReader reader = null;
         try{
-            BufferedReader reader = new BufferedReader (new FileReader(input));
+            reader = new BufferedReader (new FileReader(input));
             String line;
             while ((line = reader.readLine())!=null){
                 if(line.contains(">gi")) continue;
@@ -29,6 +30,13 @@ public class CodonTest {
         } catch (IOException e){
             e.printStackTrace();
         }
+        finally {if(reader!=null)
+			try {
+				reader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}}
         return strb.toString();
     }
     public static TreeSet<Integer> findFrame (String str){

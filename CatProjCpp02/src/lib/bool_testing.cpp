@@ -7,7 +7,7 @@ using namespace std;
 
 template<unsigned int N >
 ostream& operator<<(ostream& strm, const n_bool<N >& t){
-	strm << t.value() << " of " << N << "-th truth";
+	return strm << t.value() << " of " << N << "-th truth";
 
 }
 template<unsigned int N >

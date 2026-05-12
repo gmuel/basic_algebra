@@ -536,8 +536,10 @@ struct mat_lscl {
 	matrix_el<RNG > operator()(const RNG& scl, const matrix_el<RNG >& m) const {
 		matrix_el<RNG > cp(m);
 		_map& mCp = cp.mat.coeffs;
+		RNG pw = scl;
+		for(unsigned int i = 1; i <= m.size();++i) pw = pw * scl;
 		for(_iter i = mCp.begin();mCp.end();++i){
-			i->second = scl*(i->second);
+			i->second = pw*(i->second);
 		}
 		return cp;
 	}

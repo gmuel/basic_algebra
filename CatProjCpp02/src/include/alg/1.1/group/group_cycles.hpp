@@ -40,7 +40,6 @@ public:
 	}
 	template<typename ITER_TYPE >
 	cycle_element(ITER_TYPE i, ITER_TYPE e):map(){
-		if(i!=e) map[*i] = *i;++i;
 		for(;i!=e;++i){
 			append(*i);
 		}
@@ -52,13 +51,18 @@ public:
 	void append(const _cyclic& i){
 		insert(lastElement(),i);
 	}
+	template<typename IT >
+	void append(IT i, IT e){
+		insert(i, e,lastElement());
+	}
 
 	bool contains(const _cyclic& i) const {
 		return map.find(i)!=map.end();
 	}
 	const _cyclic& firstElement() const {
-			return map.begin()->first;
-		}
+		auto i = map.begin();
+		return i!=map.end()?i->first:TRIVIAL_ELEMENT;
+	}
 	void insert(const _cyclic& match, const _cyclic& newElement){
 		if(map.find(newElement)!=map.end()) return;
 		_iter it = map.find(match);
@@ -67,9 +71,28 @@ public:
 		it->second = newElement;
 		map[newElement] = tmp;
 	}
-	const _cyclic& lastElement() const {
-			return map[map.begin()->first];
+	template<typename IT>
+	void insert(IT i, IT e, const _cyclic& match_hint){
+		if(i==e) return;
+		auto ii = map.find(match_hint);
+		_cyclic cp = match_hint, lst;
+		if(ii==map.end()) {
+			cp = lastElement();
+			lst = firstElement();
 		}
+		else {
+			lst = ii->second;
+		}
+		while(i!=e) {
+			cp = map[cp] = *i;
+			++i;
+		}
+		map[cp] = lst;
+	}
+	const _cyclic& lastElement() const {
+		auto i = map.rbegin();
+		return i!=map.rend()?i->first:TRIVIAL_ELEMENT;
+	}
 	unsigned int length() const {
 		return map.size();
 	}

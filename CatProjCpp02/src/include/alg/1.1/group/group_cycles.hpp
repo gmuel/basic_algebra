@@ -55,7 +55,8 @@ public:
 	void append(IT i, IT e){
 		insert(i, e,lastElement());
 	}
-
+	_c_iter cbegin() const {return map.cbegin();}
+	_iter    begin()       {return map.begin();}
 	bool contains(const _cyclic& i) const {
 		return map.find(i)!=map.end();
 	}
@@ -63,31 +64,65 @@ public:
 		auto i = map.begin();
 		return i!=map.end()?i->first:TRIVIAL_ELEMENT;
 	}
+	_c_iter find(const _cyclic& c) const {
+		return map.find(c);
+	}
+	_iter   find(const _cyclic& c){
+		return map.find(c);
+	}
+	_c_iter findKey(const _cyclic& c) const {
+		_c_iter i1 = map.begin(), i2 = map.find(lastElement()), e = map.end();
+		while(i1!=e||i2!=e) {
+			if(i1!=e){
+				if(i1->second==c) return i1;
+				++i1;
+			}
+			if(i2!=e){
+				if(i2->second==c) return i2;
+				--i2;
+			}
+		}
+		return map.end();
+	}
+	_iter   findKey(const _cyclic& c){
+		_iter i1 = map.begin(), i2 = map.find(lastElement()), e = map.end();
+		while(i1!=e||i2!=e) {
+			if(i1!=e){
+				if(i1->second==c) return i1;
+				++i1;
+			}
+			if(i2!=e){
+				if(i2->second==c) return i2;
+				--i2;
+			}
+		}
+		return map.end();
+	}
 	void insert(const _cyclic& match, const _cyclic& newElement){
 		if(map.find(newElement)!=map.end()) return;
 		_iter it = map.find(match);
-		if (it==map.end()) return;
+		if (it==map.end()) return append(newElement);
 		const _cyclic& tmp = it->second;
 		it->second = newElement;
 		map[newElement] = tmp;
 	}
 	template<typename IT>
 	void insert(IT i, IT e, const _cyclic& match_hint){
+		insert(i,e,map.find(match_hint));
+	}
+	template<typename IT >
+	void insert(IT i, IT e, _iter hint){
 		if(i==e) return;
-		auto ii = map.find(match_hint);
-		_cyclic cp = match_hint, lst;
-		if(ii==map.end()) {
-			cp = lastElement();
-			lst = firstElement();
-		}
-		else {
-			lst = ii->second;
-		}
+		if(hint==map.end()) return append(i,e);
+		_cyclic cp = hint->first, tmp = i->first, last = hint->second;
 		while(i!=e) {
-			cp = map[cp] = *i;
+			if(tmp==i->first){
+				cp = map[cp] = tmp;
+				tmp = i->second;
+			}
 			++i;
 		}
-		map[cp] = lst;
+		map[cp] = last;
 	}
 	const _cyclic& lastElement() const {
 		auto i = map.rbegin();
@@ -133,22 +168,65 @@ public:
 
 	struct const_cycle_iter {
 		const cycle_element& ref;
-		const _cyclic* ptr;
-		const_cycle_iter(const cycle_element& el):ref(el),ptr(&ref.firstElement()){
-
-		}
-		const_cycle_iter(const const_cycle_iter& o):ref(o.ref),ptr(o.ptr){}
+		_c_iter it, en;
+		const _cyclic& frst,& lst;
+		const_cycle_iter (const cycle_element<N>& c):ref(c),it(ref.map.cbegin()),en(ref.map.cend()),frst(ref.firstElement()),lst(ref.lastElement()){}
+		const_cycle_iter (const const_cycle_iter& o):ref(o.ref),it(o.it),en(o.en),frst(o.frst),lst(o.lst){}
+		const_cycle_iter (const_cycle_iter&& o):ref(o.ref),it(o.it),en(o.en),frst(o.frst),lst(o.lst){}
 		const_cycle_iter& operator++(){
-			ptr = &ref(*ptr);
+			if(it!=en&&it->first != lst){
+				it = map.find(it->second);
+			}
 			return *this;
 		}
-		const_cycle_iter operator++(int){
-			const_cycle_iter it (*this);
-			this->operator ++();
-			return it;
+		const_cycle_iter& operator--(){
+			if(it!=en&&it->second != frst){
+				it = ref.findKey(it->first);
+			}
+			return *this;
 		}
-		const _cyclic* operator->() const {
-			return ptr;
+		const std::pair<_cyclic,_cyclic>* operator->() const {
+			return it.operator ->();
+		}
+		const_cycle_iter& operator=(_c_iter i){
+			it = i;
+			return *this;
+		}
+		friend bool operator==(const const_cycle_iter& i1, const const_cycle_iter& i2){
+			return i1.it==i2.it||(i1.it==i1.en&&i2.it==i2.en)?true:false;
+		}
+	};
+	struct cycle_iter {
+		cycle_element& ref;
+		_iter it, en;
+		_cyclic& frst,& lst;
+		cycle_iter (cycle_element<N>& c):ref(c),it(ref.map.cbegin()),en(ref.map.cend())
+			,frst(ref.firstElement()),lst(ref.lastElement()){}
+		cycle_iter (const cycle_iter& o):ref(o.ref),it(o.it),en(o.en)
+			,frst(o.frst),lst(o.lst){}
+		cycle_iter (cycle_iter&& o):ref(o.ref),it(o.it),en(o.en)
+			,frst(o.frst),lst(o.lst){}
+
+		cycle_iter& operator++(){
+			if(it!=en&&it->first!=lst){
+				it = map.find(it->second);
+			}
+			return *this;
+		}
+		cycle_iter& operator--(){
+			if(it!=en&&it->second!=frst){
+				it = ref.findKey(it->first);
+			}
+			return *this;
+		}
+		const std::pair<_cyclic,_cyclic>* operator->() const {
+			return it.operator ->();
+		}
+		std::pair<_cyclic,_cyclic>* operator->()    {
+			return it.operator ->();
+		}
+		friend bool operator==(const cycle_iter& i1, const cycle_iter& i2){
+			return i1.it==i2.it||(i1.it==i1.en&&i2.it==i2.en)?true:false;
 		}
 	};
 

@@ -7,7 +7,7 @@
 
 #ifndef INCLUDE_CYCLE_HPP_
 #define INCLUDE_CYCLE_HPP_
-#include "/home/fun_gab/git/basic_algebra/CatProjCpp02/src/include/alg/1.1/group/group_group_base_impl.hpp"
+#include "group_group_base_impl.hpp"
 #include <utility>
 #include <map>
 namespace sym {
@@ -89,6 +89,7 @@ public:
 		return i;
 	}
 	const_iterator cend() const {return const_iterator();}
+	bool contains(const _cyc& c) const {return find(c)!=cend();}
 	iterator end() {return iterator();}
 	const_iterator find(const _cyc& c) const {
 		_c_it i = map.find(c);

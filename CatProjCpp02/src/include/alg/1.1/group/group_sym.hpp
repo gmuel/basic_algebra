@@ -7,7 +7,7 @@
 
 #ifndef INCLUDE_SYM_HPP_
 #define INCLUDE_SYM_HPP_
-#include "/home/fun_gab/git/basic_algebra/CatProjCpp02/src/include/alg/1.1/group/group_cycles.hpp"
+#include "group_cycle.hpp"
 #include <set>
 #include <utility>
 namespace sym {
@@ -15,11 +15,11 @@ namespace sym {
 using namespace alg;
 
 template<unsigned int N>
-std::set<cycle_element<N> > common_orbit(const cycle_element<N>& c1, const cycle_element<N>& c2){
-	std::set<cycle_element<N> > s;
+std::set<cycle<N> > common_orbit(const cycle<N>& c1, const cycle<N>& c2){
+	std::set<cycle<N> > s;
 	bool lng = c1.length()<c2.length();
-	auto i = cycle_element<N>::const_cycle_iter(lng?c1:c2),
-			e = cycle_element<N>::const_cycle_iter(lng?c1:c2);
+	auto i = lng?c1.cbegin():c2.cbegin(),
+			e = lng?c1.cend():c2.cend();
 	while(i!=e) {
 		if((lng && c2.contains(*i))||c1.contains(*i)) s.insert(*i);
 		++i;
@@ -31,7 +31,7 @@ template<unsigned int N>
 class sym {
 public:
 	typedef cyclic_wrp<N > 			_cyc;
-	typedef cycle_element<N > 		_cye;
+	typedef cycle<N >		 		_cye;
 	typedef std::map<_cyc, _cye > 	_map;
 	sym(const _cyc& x1, const _cyc& x2):cyc_map(){
 		if(x1!=x2){

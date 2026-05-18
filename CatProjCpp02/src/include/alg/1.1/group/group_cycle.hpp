@@ -21,7 +21,9 @@ struct c_pair : public std::pair<alg::cyclic_wrp<N>, alg::cyclic_wrp<N> >{
 	c_pair(_cyc&& c1, _cyc&& c2):_base(c1,c2),prev(0),next(0){}
 	c_pair(const _base& o):_base(o),prev(0),next(0){}
 	c_pair(_base&& o):     _base(o),prev(0),next(0){}
-	c_pair(explicit const c_pair<N>& o):_base(o),prev(0),next(o.next!=0?new c_pair<N> (*o.next):0){}
+	c_pair(explicit const c_pair<N>& o):_base(o),prev(0),next(0){
+		if(o.next!=0) next = new c_pair<N> (*o.next);
+	}
 	c_pair(explicit c_pair<N>&& o):     _base(o),prev(0),next(o.next){}
 	~c_pair(){
 		if(next!=0) {
@@ -41,6 +43,10 @@ template<unsigned int N >
 c_pair<N> make_cpair(alg::cyclic_wrp<N>&& c1, alg::cyclic_wrp<N>&& c2){
 	c_pair<N> cp(c1,c2);
 	return cp;
+}
+template<unsigned int N >
+bool operator<(const alg::cyclic_wrp<N>& c1, const alg::cyclic_wrp<N>& c2){
+	 return *(c1)<*(c2);
 }
 
 template<unsigned int N >
@@ -93,7 +99,7 @@ public:
 	iterator end() {return iterator();}
 	const_iterator find(const _cyc& c) const {
 		_c_it i = map.find(c);
-		return i==map.end()?cend():const_iterator{i->second};
+		return i==map.cend()?cend():const_iterator{i->second};
 	}
 	iterator find(const _cyc& c) {
 		_it i = map.find(c);
@@ -144,24 +150,27 @@ public:
 		}
 
 	}
+	std::size_t length() const {std::size_t sz = map.size(); return sz==0?1:sz;}
 	friend struct const_iterator {
-		const _cpa* ptr = 0;
+		const _cpa* curr 	= 0;
 		const_iterator& operator++() {
-			if(ptr!=0) ptr = ptr->next;
+			if(curr!=0){
+				curr = curr->next;
+			}
 			return *this;
 		}
 		const_iterator& operator--() {
-			if(ptr!=0) ptr = ptr->prev;
+			if(curr!=0) curr = curr->prev;
 			return *this;
 		}
 		const _cpa* operator->() const {
-			return ptr;
+			return curr;
 		}
 		friend bool operator==(const const_iterator& i1, const const_iterator& i2){
-			return i1.ptr==i2.ptr;
+			return i1.curr==i2.curr;
 		}
 		friend bool operator!=(const const_iterator& i1, const const_iterator& i2){
-			return i1.ptr!=i2.ptr;
+			return i1.curr!=i2.curr;
 		}
 	};
 	friend struct iterator {
@@ -184,6 +193,23 @@ public:
 			return i1.ptr!=i2.ptr;
 		}
 	};
+	friend bool operator==(const cycle& c1, const cycle& c2){
+		std::size_t sz1 = c1.length(), sz2 = c2.length();
+		if((sz1==0&&sz2==1)
+				||(sz1==1&&sz2==0)) return true;
+		if(sz1!=sz2) return false;
+		auto i1 = c1.cbegin(), i2 = c2.cbegin(),
+				e1 = c1.cend(), e2 = c2.cend();
+		while(i1!=e1&&i2!=e2) {
+			if(i1->first!=i2->first||i1->second!=i2->second) return false;
+			++i1;
+			++i2;
+		}
+		return i1==e1&&i2==e2;
+	}
+	friend bool operator!=(const cycle& c1, const cycle& c2){
+		return !(c1==c2);
+	}
 	const _cyc& operator[](const _cyc& c) const {
 		const_iterator i = find(c);
 		return i!=cend()?i->second:c;
@@ -193,8 +219,8 @@ public:
 		return i!=end()?i->second:c;
 	}
 private:
-	_cpa* cpa,* first,* last;
 	_cma map;
+	_cpa* cpa,* first,* last;
 	bool create_pair(const _cyc& _frst, const _cyc& _snd, _cpa* curr){
 		if(map.find(_snd)==map.end()){
 			auto* tmp = new _cpa(_frst,_snd);

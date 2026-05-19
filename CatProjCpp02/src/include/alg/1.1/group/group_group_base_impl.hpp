@@ -43,6 +43,12 @@ struct cyclic_wrp {
 	}
 	const cyclic<N>& operator*() const {return *ptr;}
 	const cyclic<N>* operator->() const {return ptr;}
+	friend bool operator==(const cyclic_wrp<N>& c1, const cyclic_wrp<N>& c2){
+		return c1.ptr==c2.ptr;
+	}
+	friend bool operator!=(const cyclic_wrp<N>& c1, const cyclic_wrp<N>& c2){
+		return c1.ptr!=c2.ptr;
+	}
 private:
 	const cyclic<N>* ptr;
 };

@@ -19,8 +19,8 @@ public class CodonTest {
     public static final File PROT = new File (PATH+"NM_011897_3transl.txt");
     public static String readFile (File input){
         StringBuffer strb = new StringBuffer ();
-        try{
-            BufferedReader reader = new BufferedReader (new FileReader(input));
+        try(BufferedReader reader = new BufferedReader (new FileReader(input))){
+            
             String line;
             while ((line = reader.readLine())!=null){
                 if(line.contains(">gi")) continue;
@@ -28,6 +28,7 @@ public class CodonTest {
             }
         } catch (IOException e){
             e.printStackTrace();
+            return "";
         }
         return strb.toString();
     }

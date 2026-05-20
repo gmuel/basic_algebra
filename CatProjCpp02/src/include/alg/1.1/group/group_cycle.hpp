@@ -270,6 +270,32 @@ private:
 	}
 };
 
+template<>
+class cycle<1u > {
+protected:
+	cycle(){}
+	cycle(const cycle<1u>& o){}
+	cycle(cycle<1u>&& o){}
+	cycle<1u>& operator=(const cycle<1u>& s){return *this;}
+public:
+	~cycle(){}
+	static const cycle<1u>& ID;
+	friend const cycle<1u>& operator*(const cycle<1u>& s1, const cycle<1u>& s2) {return ID;}
+	friend bool operator==(const cycle<1u>& c1, const cycle<1u>& c2) {
+		return true;
+	}
+};
+
+const cycle<1u>& cycle<1u>::ID = cycle();
+template<>
+class cycle<0u> : public cycle<1u > {
+public:
+	using cycle<1u>::ID;
+};
+/*template<>
+class cycle<2u> : public alg::cyclic_wrp<2u> {
+
+};*/
 }
 
 

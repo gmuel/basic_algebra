@@ -15,6 +15,13 @@
 						<value name="/usr/games"/>
 						<value name="/usr/local/games"/>
 					</stringListMacro>
+					<stringMacro name="PTH_INCL3" type="VALUE_TEXT" value="/run/user/1001/doc/22c7307c/include"/>
+					<stringMacro name="PTH_INCL2" type="VALUE_TEXT" value="/run/user/1001/doc/c78998e2/include"/>
+					<stringMacro name="PTH_INCL1" type="VALUE_TEXT" value="/run/user/1001/doc/fd53b8f2/include"/>
+					<stringMacro name="PTH_BCK" type="VALUE_TEXT" value="/run/user/1001/doc/3fadffd1/backward"/>
+					<stringMacro name="PTH_131" type="VALUE_TEXT" value="/run/user/1001/doc/190769ac/13"/>
+					<stringMacro name="PTH_132" type="VALUE_TEXT" value="/run/user/1001/doc/2e0519e9/13"/>
+					<stringMacro name="PTH_GNU" type="VALUE_TEXT" value="/run/user/1001/doc/4451c0/x86_64-linux-gnu"/>
 				</macros>
 				<externalSettings/>
 				<extensions>

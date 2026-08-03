@@ -56,13 +56,13 @@
 									<listOptionValue builtIn="false" value="CPP_BASE_HEADS=/usr/include/c++/11/"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.387969128" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/fd53b8f2/include"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/2e0519e9/13"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/3fadffd1/backward"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/4451c0/x86_64-linux-gnu"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/190769ac/13"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/c78998e2/include"/>
-									<listOptionValue builtIn="false" value="/run/user/1001/doc/22c7307c/include"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC4}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC5}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC6}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${USR_LIB_INC7}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.617092032" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>

@@ -16,6 +16,7 @@ namespace num {
 template<typename _EXPR_TYPE >
 struct expr {
 
+
 };
 
 template<typename _DUAL_TYPE >
@@ -102,57 +103,49 @@ struct dual { // : public _DUAL_TYPE {
 		i >> s.del;
 		return i;
 	}
+	friend _dt abs(const _tc& s){
+		return std::abs(s.val);
+	}
+	friend _tc dabs(const _tc& s){
+		return _tc{std::abs(s.val),s.val<0?-s.del:s.del};
+	}
+	friend _tc sqrt(const _tc& s){
+		_dt sqr = std::sqrt(s.val);
+		return _tc{sqr,_dt(.5)*s.del/sqr};
+	}
+	friend _tc pow(const _tc& s, int i){
+		if(i==0) return _tc(s.val==0?0:1);
+		if(i==1) return s;
+		if(i<0) return pow(1/s,-i);
+		_dt pw = i==2?s.val:std::pow(s.val, i-1);
+		return _tc{pw*s.val,i*pw*s.del};
+	}
+	friend _tc log(const _tc& s){
+		return _tc{std::log(s.val),s.del/s.val};
+	}
+
+	friend _tc exp(const _tc& s){
+		auto val = std::exp(s.val);
+		return _tc{val,val*s.del};
+	}
+	friend _tc sin(const _tc& s){
+		return _tc{std::sin(s.val),s.del*std::cos(s.val)};
+	}
+	friend _tc cos(const _tc& s){
+		return _tc{std::cos(s.val),-s.del*std::sin(s.val)};
+	}
+	friend _tc sinh(const _tc& s){
+		return _tc{std::sinh(s.val),std::cosh(s.val)*s.del};
+	}
+	friend _tc cosh(const _tc& s){
+		return _tc{std::cosh(s.val),-std::sinh(s.val)*s.del};
+	}
 };
 
 typedef dual<float > 		_fdual;
 typedef dual<double >		_ddual;
 typedef dual<long double >	_ldual;
 
-template<typename _DUAL >
-_DUAL abs(const dual<_DUAL >& s){
-	return std::abs(s.val);
-}
-template<typename _DUAL >
-dual<_DUAL > dabs(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::abs(s.val),s.val<0?-s.del:s.del};
-}
-template<typename _DUAL >
-dual<_DUAL > sqrt(const dual<_DUAL >& s){
-	_DUAL sqr = std::sqrt(s.val);
-	return dual<_DUAL >{sqr,_DUAL(.5)*s.del/sqr};
-}
-template<typename _DUAL >
-dual<_DUAL > pow(const dual<_DUAL >& s, int i){
-	if(i==0) return dual<_DUAL >(s.val==0?0:1);
-	if(i==1) return s;
-	if(i<0) return pow(1/s,-i);
-	_DUAL pw = i==2?s.val:std::pow(s.val, i-1);
-	return dual<_DUAL >{pw*s.val,i*pw*s.del};
-}
-template<typename _DUAL >
-dual<_DUAL > log(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::log(s.val),s.del/s.val};
-}
-template<typename _DUAL >
-dual<_DUAL > exp(const dual<_DUAL >& s){
-	return std::exp(s.val) * dual<_DUAL >{_DUAL(1),s.del};
-}
-template<typename _DUAL >
-dual<_DUAL > sin(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::sin(s.val),s.del*std::cos(s.val)};
-}
-template<typename _DUAL >
-dual<_DUAL > cos(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::cos(s.val),-s.del*std::sin(s.val)};
-}
-template<typename _DUAL >
-dual<_DUAL > sinh(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::sinh(s.val),std::cosh(s.val)*s.del};
-}
-template<typename _DUAL >
-dual<_DUAL > cosh(const dual<_DUAL >& s){
-	return dual<_DUAL >{std::cosh(s.val),-std::sinh(s.val)*s.del};
-}
 }
 
 #endif /* INCLUDE_AUTO_DIFF_HPP_ */

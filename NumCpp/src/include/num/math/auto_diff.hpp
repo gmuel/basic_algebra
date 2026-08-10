@@ -15,15 +15,15 @@ namespace num {
 
 template<typename _EXPR_TYPE >
 struct expr {
-
-
+	_EXPR_TYPE val;
+	void eval(){}
 };
 
 template<typename _DUAL_TYPE >
-struct dual { // : public _DUAL_TYPE {
+struct dual : public expr<_DUAL_TYPE > {
 	typedef _DUAL_TYPE _dt;
 	typedef dual<_dt > _tc;
-	_dt val, del;
+	_dt del;
 
 	dual(const _dt& vl = _dt(), const _dt& dl = _dt()):val(vl),del(dl){}
 	dual(int vl, int dl = 0):val(vl),del(dl){}

@@ -23,6 +23,8 @@ template<typename _DUAL_TYPE >
 struct dual : public expr<_DUAL_TYPE > {
 	typedef _DUAL_TYPE _dt;
 	typedef dual<_dt > _tc;
+
+	const static _dt	EPS;
 	_dt del;
 
 	dual(const _dt& vl = _dt(), const _dt& dl = _dt()):val(vl),del(dl){}
@@ -46,7 +48,27 @@ struct dual : public expr<_DUAL_TYPE > {
 		del = d.del;
 		return *this;
 	}
-
+	_tc& operator+=(const _tc& d){
+		val = val + d.val;
+		del = del + d.del;
+		return *this;
+	}
+	_tc& operator-=(const _tc& d){
+		val = val - d.val;
+		del = del - d.del;
+		return *this;
+	}
+	_tc& operator*=(const _tc& d){
+		val = val * d.val;
+		del = del * d.val + val * d.del;
+		return *this;
+	}
+	_tc& operator/=(const _tc& d){
+		_dt scl = 1/d.val, scl1 = val*scl;
+		val = scl1;
+		del = (s1.del-scl1*s2.del)*scl;
+		return *this;
+	}
 	friend bool operator==(const _tc& s1, const _tc& s2){
 		return s1.val==s2.val && s1.del == s2.del;
 	}
@@ -146,6 +168,14 @@ typedef dual<float > 		_fdual;
 typedef dual<double >		_ddual;
 typedef dual<long double >	_ldual;
 
+template< >
+const float dual<float >::EPS = 1e-8;
+
+template< >
+const double dual<double >::EPS = 1e-15;
+
+template< >
+const long double dual<long double >::EPS = 1e-28;
 }
 
 #endif /* INCLUDE_AUTO_DIFF_HPP_ */

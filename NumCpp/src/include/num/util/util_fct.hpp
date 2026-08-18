@@ -26,6 +26,34 @@ struct fct {
 	}
 };
 
+template<typename _iter
+		,typename _ctype
+		,typename _dtype>
+struct fct_iter {
+	typedef fct<_ctype,_dtype > 			_fct;
+	typedef fct_iter<_iter,_ctype,_dtype >	_tc;
+	_fct fct;
+	_iter it;
+	_tc& operator++(){
+		++it;
+		return *this;
+	}
+	_tc& operator--(){
+		--it;
+		return *this;
+	}
+	_dtype operator->() const {
+		const _ctype* ptr = it.operator->();
+		return ptr!=0?fct(*ptr):_dtype();
+	}
+	friend bool operator==(const _tc& i1, const _tc& i2){
+		return i1.it==i2.it;
+	}
+	friend bool operator!=(const _tc& i1, const _tc& i2){
+		return i1.it!=i2.it;
+	}
+};
+
 }
 
 

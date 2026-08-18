@@ -20,19 +20,19 @@ public:
 	typedef std::map<unsigned int,dual<_DUAL> > _map;
 	typedef typename _map::const_iterator		_cit;
 	typedef typename _map::iterator				_it;
-	vec(unsigned i = 0, const _dt& val = _dt()):coefs(){
+	vec(unsigned i = 0, const _dt& val = _dt()):coefs(),eps(_dt::EPS){
 		if(val!=0) coefs[i] = val;
 	}
 	template<typename _ITER >
-	vec(_ITER i, _ITER e, unsigned int start = 0):coefs(){
+	vec(_ITER i, _ITER e, unsigned int start = 0):coefs(),eps(_dt::EPS){
 		for(;i!=e;++i) {
 			const _dt& val = *i;
 			if(val!=0) coefs[start] = val;
 			++start;
 		}
 	}
-	vec(const _tc& o):coefs(o.coefs){}
-	vec(_tc&& o):coefs(o.coefs){}
+	vec(const _tc& o):coefs(o.coefs),eps(_dt::EPS){}
+	vec(_tc&& o):coefs(o.coefs),eps(_dt::EPS){}
 	~vec(){}
 	_dt& operator[](unsigned int i){
 		return coefs[i];
@@ -52,6 +52,10 @@ public:
 		}
 		return *this;
 	}
+	_tc& operator*=(const _dt& d) {
+		for(auto i = coefs.begin();i!=coefs.end();++i) i->second *= d;
+		return *this;
+	}
 	unsigned int suppCount() const {
 		unsigned int cnt(0);
 		_dt norm2 = norm2();
@@ -65,8 +69,13 @@ public:
 		for(auto i = coefs.cbegin(); i!=coefs.cend();++i) nrm += i->second * i->second;
 		return sqrt(nrm);
 	}
+	friend _tc operator-(const _tc& s1) {
+		_tc ng;
+		for(auto i = s1.coefs.cbegin(); i!= s1.coefs.cend(); ++i)	ng[i->first] = -(i->second);
+		return ng;
+	}
 	friend _tc operator+(const vec<_dt >& s1, const vec<_dt >& s2){
-		const _tc* mx,* mn;
+		const _tc* mx = 0,* mn = 0;
 		unsigned int supp1 = s1.suppCount(), supp2 = s2.suppCount();
 		if(supp1>supp2){
 			mx = &s1;
@@ -77,20 +86,18 @@ public:
 			mn = &s1;
 		}
 		_tc sum(*mx);
-		_dt nrm = sum.norm2();
-		nrm *= nrm;
-		for(_cit i = mn->coefs.cbegin(); i!=mn->coefs.cend();++i) {
-			auto tmp = sum[i->first] + i->second;
-			if(dabs(dabs(sum)-nrm)>sum.eps) {
-				sum[i->first] = tmp;
-				nrm += nrm + tmp * tmp;
-			}
-			else sum.coefs.erase(i->first);
-		}
+		sum += *mn;
 		return sum;
 	}
 	friend _tc operator*(const _dt& s1, const _tc& s2){
-
+		_tc scl(s2);
+		for(auto i = scl.coefs.begin(); i!=scl.coefs.end();++i) i->second = s1 * i->second;
+		return scl;
+	}
+	friend _tc operator*(const _tc& s1, const _dt& s2){
+		_tc scl(s1);
+		for(auto i = scl.coefs.begin(); i!=scl.coefs.end();++i) i->second = i->second * s2;
+		return scl;
 	}
 private:
 	_map coefs;

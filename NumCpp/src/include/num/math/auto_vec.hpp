@@ -8,11 +8,12 @@
 #ifndef INCLUDE_NUM_MATH_AUTO_VEC_HPP_
 #define INCLUDE_NUM_MATH_AUTO_VEC_HPP_
 #include "auto_diff.hpp"
+#include "../util/util_fct.hpp"
 #include <map>
 namespace num {
 
 template<typename _DUAL >
-class vec {
+class vec : public expr<_DUAL >{
 
 public:
 	typedef _DUAL 								_dt;
@@ -20,7 +21,7 @@ public:
 	typedef std::map<unsigned int,dual<_DUAL> > _map;
 	typedef typename _map::const_iterator		_cit;
 	typedef typename _map::iterator				_it;
-	vec(unsigned i = 0, const _dt& val = _dt()):coefs(),eps(_dt::EPS){
+	vec(const _dt& val = _dt(), unsigned i = 0):coefs(),eps(_dt::EPS){
 		if(val!=0) coefs[i] = val;
 	}
 	template<typename _ITER >
@@ -34,6 +35,8 @@ public:
 	vec(const _tc& o):coefs(o.coefs),eps(_dt::EPS){}
 	vec(_tc&& o):coefs(o.coefs),eps(_dt::EPS){}
 	~vec(){}
+	_tc& operator=(const _tc& o) = default;
+	_tc& operator=(_tc&& o) = default;
 	_dt& operator[](unsigned int i){
 		return coefs[i];
 	}
@@ -102,6 +105,42 @@ public:
 private:
 	_map coefs;
 	_dt eps;
+
+};
+
+
+template<typename _DUAL >
+class v_fct : public vec<_DUAL > {
+	_fct f;
+	vec<_DUAL > arg,
+		img;
+public:
+	typedef _DUAL			_dt;
+	typedef	vec<_dt >		_vc;
+	typedef v_fct<_dt >		_tc;
+	typedef fct<_vc, _vc >	_fc;
+	struct _fct : public _fc {
+
+	};
+	_dt operator()(const _dt& x) const {
+		return f(x);
+	}
+	_tc& operator=(const _tc& x) = default;
+	_tc& operator=(_tc&& x) = default;
+	_tc& operator=(const _vc& x) {
+		arg = x;
+		return *this;
+	}
+	_tc& operator=(_vc&& x) {
+		arg = x;
+		return *this;
+	}
+	const _fct* operator->() const {
+		return &f;
+	}
+	void eval(){
+		img = f(arg);
+	}
 
 };
 

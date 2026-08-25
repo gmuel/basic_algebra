@@ -125,6 +125,11 @@ public:
 	_dt operator()(const _dt& x) const {
 		return f(x);
 	}
+	_dt operator()(_dt&& x) {
+		operator=(x);
+		eval();
+		return img;
+	}
 	_tc& operator=(const _tc& x) = default;
 	_tc& operator=(_tc&& x) = default;
 	_tc& operator=(const _vc& x) {
@@ -139,10 +144,11 @@ public:
 		return &f;
 	}
 	void eval(){
-		img = f(arg);
+		img = operator()(arg);
 	}
 
 };
+
 
 }
 

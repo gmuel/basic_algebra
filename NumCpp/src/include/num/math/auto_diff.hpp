@@ -117,6 +117,14 @@ struct dual : public expr<_DUAL_TYPE > {
 		_dt scl = 1/s2.val, scl1 = s1*scl;
 		return _tc{scl1,-scl1*s2.del*scl};
 	}
+	friend _tc operator/(int s1, const _tc& s2){
+		_dt scl = 1/s2.val, scl1 = s1*scl;
+		return _tc{scl1,-scl1*s2.del*scl};
+	}
+	friend _tc operator/(const _tc& s1, int s2){
+		_dt scl1 = 1.0/s2;
+		return _tc{s1.val*scl1,scl1*s1.del};
+	}
 	friend std::ostream& operator<<(std::ostream& o, const 	_tc& s){
 		return o << s.val << " + " << s.del << " d";
 	}

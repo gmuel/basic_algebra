@@ -54,6 +54,18 @@ struct fct_iter {
 	}
 };
 
+template<typename _co_dom1
+		,typename _co_dom2
+		,typename _dom>
+struct pfct : public fct <fct<std::pair<_co_dom1,_co_dom2 >, _dom>, fct<_co_dom1,fct<_co_dom2,_dom > > > {
+	fct<_co_dom2, _dom > operator()(const fct<std::pair<_co_dom1,_co_dom2 >, _dom >& f) const {
+		return [=] (const _co_dom1& arg1){
+			return [=] (const _co_dom2& arg2){
+				return f(std::pair<_co_dom1,_co_dom2 >::pair(arg1, arg2));
+			};
+		};
+	}
+};
 }
 
 

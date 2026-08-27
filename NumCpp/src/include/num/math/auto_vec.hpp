@@ -125,7 +125,7 @@ public:
 	_dt operator()(const _dt& x) const {
 		return f(x);
 	}
-	_dt operator()(_dt&& x) {
+	const _dt& operator()(_dt&& x) {
 		operator=(x);
 		eval();
 		return img;
@@ -144,7 +144,7 @@ public:
 		return &f;
 	}
 	void eval(){
-		img = operator()(arg);
+		img = operator()(const_cast<const _vc&>(arg));
 	}
 
 };
